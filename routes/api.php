@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckJwtToken;
 use App\Http\Controllers\LoginController;
@@ -14,4 +15,6 @@ Route::group(['middleware' => [CheckJwtToken::class, 'auth:api']], function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name("logout");
     Route::get('/user', [LoginController::class, 'getUser'])->name("user");
     Route::get('/dashboard', [DashboardController::class, 'index'])->name("dashboard");
+
+    Route::resource('users', UserController::class);
 });
