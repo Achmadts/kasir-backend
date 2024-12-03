@@ -24,9 +24,9 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email" => "unique:users,email",
+            "email" => "email",
             "password" => "min:6",
-            "images" => "file|mimes:png,jpg,jpeg|max:2048"
+            "images" => "nullable|mimes:png,jpg,jpeg|max:2048"
         ];
     }
     public function failedValidation(Validator $validator)

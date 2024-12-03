@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Classes\ApiResponseClass;
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Middleware\CheckJwtToken;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\{DB, Auth};
@@ -115,10 +117,25 @@ class UserController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
+        $newEmail = $request->email ?? $user->email;
+        $existingUserWithEmail = User::where('email', $newEmail)
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($existingUserWithEmail && $existingUserWithEmail->id !== $id) {
+            return ApiResponseClass::sendError('The Email has already been taken by another user.', 422);
+        }
+
+        if ($request->has('currentPassword')) {
+            if (!Hash::check($request->currentPassword, $user->password)) {
+                return ApiResponseClass::sendError('The current password is incorrect.', 422);
+            }
+        }
+
         $oldImagePath = $user->images;
         $updateDetails = [
             'name' => $request->name ?? $user->name,
-            'email' => $request->email ?? $user->email,
+            'email' => $newEmail ?? $user->email,
             'password' => $request->password ? bcrypt($request->password) : $user->password,
             'images' => $oldImagePath,
         ];

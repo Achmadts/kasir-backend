@@ -14,7 +14,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function getById($id)
     {
-        return User::findOrFail($id);
+        return User::find($id);
     }
 
     public function store(array $data)
