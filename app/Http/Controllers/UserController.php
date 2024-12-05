@@ -4,16 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Classes\ApiResponseClass;
-use App\Http\Middleware\CheckAdmin;
 use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Middleware\CheckJwtToken;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\{DB, Auth};
 use App\Interfaces\UserRepositoryInterface;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
+use Illuminate\Support\Facades\{DB, Storage, Auth, Hash};
 use App\Http\Requests\{StoreUserRequest, UpdateUserRequest};
+use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 
 class UserController extends Controller implements HasMiddleware
 {

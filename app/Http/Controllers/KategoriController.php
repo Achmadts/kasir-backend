@@ -61,6 +61,7 @@ class KategoriController extends Controller implements HasMiddleware
             'kode_kategori' => $request->kode_kategori,
             'nama_kategori' => $request->nama_kategori,
         ];
+
         DB::beginTransaction();
         try {
             $kategori = $this->kategoriRepositoryInterface->store($details);
@@ -111,14 +112,19 @@ class KategoriController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
+        $NewKodeKategori = $request->kode_kategori ?? $kategori->kode_kategori;
+        $existingKategoriWithKodeKategori = Kategori::where('kode_kategori', $NewKodeKategori)
+            ->where('id', '!=', $id)
+            ->first();
+
         $updateDetails = [
-            'kode_kategori' => $request->kode_kategori,
-            'nama_kategori' => $request->nama_kategori,
+            'kode_kategori' => $request->kode_kategori ?? $kategori->kode_kategori,
+            'nama_kategori' => $request->nama_kategori ?? $kategori->nama_kategori,
         ];
 
         DB::beginTransaction();
         try {
-            $product = $this->kategoriRepositoryInterface->update($updateDetails, $id);
+            $kategori = $this->kategoriRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
             return ApiResponseClass::sendResponse('Kategori Update Successful', '', 201);
