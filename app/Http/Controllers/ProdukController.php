@@ -51,6 +51,12 @@ class ProdukController extends Controller implements HasMiddleware
      */
     public function store(StoreProdukRequest $request)
     {
+        $loggedInUser = Auth::user();
+
+        if (!$loggedInUser->is_admin) {
+            return ApiResponseClass::sendError('Unauthorized Access', 403);
+        }
+        
         $details = [
             'nama_produk' => $request->nama_produk,
             'harga' => $request->harga,
