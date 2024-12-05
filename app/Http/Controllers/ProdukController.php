@@ -56,7 +56,7 @@ class ProdukController extends Controller implements HasMiddleware
         if (!$loggedInUser->is_admin) {
             return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
-        
+
         $details = [
             'nama_produk' => $request->nama_produk,
             'harga' => $request->harga,
