@@ -22,8 +22,8 @@ class ProdukController extends Controller implements HasMiddleware
     {
         return [
             'auth:api',
-            new Middleware(CheckJwtToken::class, only: ['index', 'update', 'destroy']),
-            new Middleware(CheckAdmin::class, except: ['store', 'show'])
+            new Middleware(CheckJwtToken::class, only: ['store', 'update', 'destroy']),
+            new Middleware(CheckAdmin::class, except: ['index', 'show'])
         ];
     }
 
@@ -132,12 +132,18 @@ class ProdukController extends Controller implements HasMiddleware
     {
         $loggedInUser = Auth::user();
 
+        $product = $this->productRepositoryInterface->getById($id);
+
+        if (!$product) {
+            return ApiResponseClass::sendError('Product Not Found', 404);
+        }
+
         if (!$loggedInUser->is_admin) {
             return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
         $this->productRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('Product Delete Successful', '', 204);
+        return ApiResponseClass::sendResponse('Product Delete Successful', 204);
 
     }
 }
