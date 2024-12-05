@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KategoriController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckJwtToken;
 use App\Http\Controllers\UserController;
@@ -19,4 +20,5 @@ Route::group(['middleware' => [CheckJwtToken::class, 'auth:api']], function () {
 
     Route::resource('users', UserController::class);
     Route::resource('produk', ProdukController::class);
+    Route::resource('kategori', KategoriController::class);
 });
