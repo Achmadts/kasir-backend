@@ -7,7 +7,7 @@ use App\Classes\ApiResponseClass;
 use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\{DB, Auth};
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
-use App\Interfaces\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 use App\Http\Requests\{StoreProdukRequest, UpdateProdukRequest};
 

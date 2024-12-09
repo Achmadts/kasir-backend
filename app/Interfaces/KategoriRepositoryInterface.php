@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Interfaces\Interfaces;
+namespace App\Interfaces;
 
-interface ProductRepositoryInterface
+interface KategoriRepositoryInterface
 {
-    public function index();
+    public function index($perPage, $searchTerm);
     public function getById($id);
     public function store(array $data);
     public function update(array $data, $id);

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Interfaces\Interfaces;
+namespace App\Interfaces;
 
-interface KategoriRepositoryInterface
+interface ProductRepositoryInterface
 {
     public function index();
     public function getById($id);

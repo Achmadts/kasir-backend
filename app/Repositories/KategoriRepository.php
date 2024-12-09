@@ -2,14 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\Interfaces\KategoriRepositoryInterface;
+use App\Interfaces\KategoriRepositoryInterface;
 use App\Models\Kategori;
 
 class KategoriRepository implements KategoriRepositoryInterface
 {
-    public function index()
+    public function index($perPage, $searchTerm = '')
     {
-        return Kategori::all();
+        $query = Kategori::query();
+        if ($searchTerm) {
+            $query->where('nama_kategori', 'like', '%' . $searchTerm . '%');
+        }
+        return $query->paginate($perPage);
     }
 
     public function getById($id)

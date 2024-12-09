@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kategori;
+use Illuminate\Http\Request;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\KategoriResource;
 use Illuminate\Support\Facades\{DB, Auth};
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
-use App\Interfaces\Interfaces\KategoriRepositoryInterface;
+use App\Interfaces\KategoriRepositoryInterface;
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 use App\Http\Requests\{StoreKategoriRequest, UpdateKategoriRequest};
 
@@ -32,10 +33,13 @@ class KategoriController extends Controller implements HasMiddleware
         $this->kategoriRepositoryInterface = $kategoriRepositoryInterface;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $kategori = $this->kategoriRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(KategoriResource::collection($kategori), '', 200);
+        $perPage = $request->input('per_page', 200);
+        $searchTerm = $request->input('searchTerm', '');
+        $kategori = $this->kategoriRepositoryInterface->index($perPage, $searchTerm);
+
+        return ApiResponseClass::sendResponse(KategoriResource::collection($kategori)->response()->getData(true), '', 200);
     }
 
     /**
@@ -116,6 +120,10 @@ class KategoriController extends Controller implements HasMiddleware
         $existingKategoriWithKodeKategori = Kategori::where('kode_kategori', $NewKodeKategori)
             ->where('id', '!=', $id)
             ->first();
+
+        if ($existingKategoriWithKodeKategori && $existingKategoriWithKodeKategori->id !== $id) {
+            return ApiResponseClass::sendError('The Kode Kategori has already been taken.', 422);
+        }
 
         $updateDetails = [
             'kode_kategori' => $request->kode_kategori ?? $kategori->kode_kategori,

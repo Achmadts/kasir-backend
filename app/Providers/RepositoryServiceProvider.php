@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
-use App\Interfaces\Interfaces\KategoriRepositoryInterface;
+use App\Interfaces\KategoriRepositoryInterface;
 use App\Repositories\KategoriRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Interfaces\UserRepositoryInterface;
-use App\Interfaces\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
