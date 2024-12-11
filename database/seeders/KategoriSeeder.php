@@ -12,7 +12,7 @@ class KategoriSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i < 15; $i++) {
+        for ($i = 1; $i <= 15; $i++) {
             DB::table('kategoris')->insert([
                 'nama_kategori' => 'Kategori ' . $i,
                 'kode_kategori' => 'CA-' . $i,
