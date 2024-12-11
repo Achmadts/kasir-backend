@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use App\Exports\KategoriExport;
 use App\Classes\ApiResponseClass;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\KategoriResource;
 use Illuminate\Support\Facades\{DB, Auth};
-use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use App\Interfaces\KategoriRepositoryInterface;
+use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 use App\Http\Requests\{StoreKategoriRequest, UpdateKategoriRequest};
 
@@ -31,6 +33,11 @@ class KategoriController extends Controller implements HasMiddleware
     public function __construct(KategoriRepositoryInterface $kategoriRepositoryInterface)
     {
         $this->kategoriRepositoryInterface = $kategoriRepositoryInterface;
+    }
+
+    public function export()
+    {
+        return Excel::download(new KategoriExport, 'categories.xlsx');
     }
 
     public function index(Request $request)
@@ -122,7 +129,16 @@ class KategoriController extends Controller implements HasMiddleware
             ->first();
 
         if ($existingKategoriWithKodeKategori && $existingKategoriWithKodeKategori->id !== $id) {
-            return ApiResponseClass::sendError('The Kode Kategori has already been taken.', 422);
+            return ApiResponseClass::sendError('The Category Code has already been taken.', 422);
+        }
+
+        $NewNamaKategori = $request->nama_kategori ?? $kategori->nama_kategori;
+        $existingKategoriWithNamaKategori = Kategori::where('nama_kategori', $NewNamaKategori)
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($existingKategoriWithNamaKategori && $existingKategoriWithNamaKategori->id !== $id) {
+            return ApiResponseClass::sendError('The Category Name has already been taken.', 422);
         }
 
         $updateDetails = [

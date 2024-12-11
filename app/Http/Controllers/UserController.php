@@ -122,6 +122,15 @@ class UserController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('The Email has already been taken by another user.', 422);
         }
 
+        $newName = $request->name ?? $user->name;
+        $existingUserWithName = User::where('name', $newName)
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($existingUserWithName && $existingUserWithName->id !== $id) {
+            return ApiResponseClass::sendError('The Name has already been taken by another user.', 422);
+        }
+
         if ($request->has('currentPassword')) {
             if (!Hash::check($request->currentPassword, $user->password)) {
                 return ApiResponseClass::sendError('The current password is incorrect.', 422);
