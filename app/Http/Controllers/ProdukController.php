@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produk;
+use Illuminate\Http\Request;
+use App\Exports\ProdukExport;
 use App\Classes\ApiResponseClass;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\{DB, Auth};
-use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use App\Interfaces\ProductRepositoryInterface;
+use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 use App\Http\Requests\{StoreProdukRequest, UpdateProdukRequest};
 
@@ -32,10 +35,17 @@ class ProdukController extends Controller implements HasMiddleware
         $this->productRepositoryInterface = $productRepositoryInterface;
     }
 
-    public function index()
+    public function export()
     {
-        $produk = $this->productRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(ProductResource::collection($produk), '', 200);
+        return Excel::download(new ProdukExport, 'products.xlsx');
+    }
+
+    public function index(Request $request)
+    {
+        $perPage = $request->input('per_page', 200);
+        $searchTerm = $request->input('searchTerm', '');
+        $produk = $this->productRepositoryInterface->index($perPage, $searchTerm);
+        return ApiResponseClass::sendResponse(ProductResource::collection($produk)->response()->getData(true), '', 200);
     }
 
     /**
@@ -86,7 +96,6 @@ class ProdukController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('Product Not Found', 404);
         }
 
-        $product = $this->productRepositoryInterface->getById($id);
         return ApiResponseClass::sendResponse(new ProductResource($product), '', 200);
     }
 
@@ -107,7 +116,7 @@ class ProdukController extends Controller implements HasMiddleware
         $product = $this->productRepositoryInterface->getById($id);
 
         if (!$product) {
-            return ApiResponseClass::sendError('Product Not Found', 404);
+            return ApiResponseClass::sendError('Produk Not Found', 404);
         }
 
         if (!$loggedInUser->is_admin) {
@@ -137,7 +146,6 @@ class ProdukController extends Controller implements HasMiddleware
     public function destroy($id)
     {
         $loggedInUser = Auth::user();
-
         $product = $this->productRepositoryInterface->getById($id);
 
         if (!$product) {

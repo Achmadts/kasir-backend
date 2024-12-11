@@ -4,7 +4,7 @@ namespace App\Interfaces;
 
 interface ProductRepositoryInterface
 {
-    public function index();
+    public function index($perPage, $searchTerm);
     public function getById($id);
     public function store(array $data);
     public function update(array $data, $id);

@@ -7,9 +7,13 @@ use App\Models\Produk;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    public function index()
+    public function index($perPage, $searchTerm = '')
     {
-        return Produk::all();
+        $query = Produk::query();
+        if ($searchTerm) {
+            $query->where('nama_produk', 'like', '%' . $searchTerm . '%');
+        }
+        return $query->paginate($perPage);
     }
 
     public function getById($id)
