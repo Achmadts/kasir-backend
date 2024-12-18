@@ -25,8 +25,8 @@ class KategoriController extends Controller implements HasMiddleware
     {
         return [
             'auth:api',
-            new Middleware(CheckJwtToken::class, only: ['index', 'update', 'destroy', 'store']),
-            new Middleware(CheckAdmin::class, except: ['show', 'index'])
+            new Middleware(CheckJwtToken::class, only: ['index', 'show', 'store', 'update', 'destroy']), //opsional
+            new Middleware(CheckAdmin::class, only: ['update', 'destroy', 'store']), // method yang tidak boleh diakses oleh is_admin === 0
         ];
     }
 
@@ -62,12 +62,6 @@ class KategoriController extends Controller implements HasMiddleware
      */
     public function store(StoreKategoriRequest $request)
     {
-        $loggedInUser = Auth::user();
-
-        if (!$loggedInUser->is_admin) {
-            return ApiResponseClass::sendError('Unauthorized Access', 403);
-        }
-
         $details = [
             'kode_kategori' => $request->kode_kategori,
             'nama_kategori' => $request->nama_kategori,
@@ -112,15 +106,10 @@ class KategoriController extends Controller implements HasMiddleware
      */
     public function update(UpdateKategoriRequest $request, $id)
     {
-        $loggedInUser = Auth::user();
         $kategori = $this->kategoriRepositoryInterface->getById($id);
 
         if (!$kategori) {
             return ApiResponseClass::sendError('Kategori Not Found', 404);
-        }
-
-        if (!$loggedInUser->is_admin) {
-            return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
         $NewKodeKategori = $request->kode_kategori ?? $kategori->kode_kategori;
@@ -163,15 +152,10 @@ class KategoriController extends Controller implements HasMiddleware
      */
     public function destroy($id)
     {
-        $loggedInUser = Auth::user();
         $kategori = $this->kategoriRepositoryInterface->getById($id);
 
         if (!$kategori) {
             return ApiResponseClass::sendError('Kategori Not Found', 404);
-        }
-
-        if (!$loggedInUser->is_admin) {
-            return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
         $this->kategoriRepositoryInterface->delete($id);

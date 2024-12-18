@@ -21,7 +21,7 @@ class CheckAdmin
         if (!$user || $user->is_admin !== 1) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized.'
             ], 403);
         }
 

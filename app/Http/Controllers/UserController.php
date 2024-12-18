@@ -22,8 +22,8 @@ class UserController extends Controller implements HasMiddleware
     {
         return [
             'auth:api',
-            new Middleware(CheckJwtToken::class, only: ['index']),
-            new Middleware(CheckAdmin::class, except: ['store', 'show', 'update', 'destroy'])
+            new Middleware(CheckJwtToken::class, only: ['index', 'show', 'store', 'update', 'destroy']), //opsional
+            new Middleware(CheckAdmin::class, only: ['destroy', 'store']), // method yang tidak boleh diakses oleh is_admin === 0
         ];
     }
 

@@ -21,8 +21,8 @@ class ProdukController extends Controller implements HasMiddleware
     {
         return [
             'auth:api',
-            new Middleware(CheckJwtToken::class, only: ['store', 'update', 'destroy']),
-            new Middleware(CheckAdmin::class, except: ['index', 'show'])
+            new Middleware(CheckJwtToken::class, only: ['index', 'show', 'store', 'update', 'destroy']), //opsional
+            new Middleware(CheckAdmin::class, only: ['update', 'destroy', 'store']), // method yang tidak boleh diakses oleh is_admin === 0
         ];
     }
 
@@ -48,9 +48,9 @@ class ProdukController extends Controller implements HasMiddleware
     {
         $loggedInUser = Auth::user();
 
-        if (!$loggedInUser->is_admin) {
-            return ApiResponseClass::sendError('Unauthorized Access', 403);
-        }
+        // if (!$loggedInUser->is_admin) {
+        //     return ApiResponseClass::sendError('Unauthorized Access', 403);
+        // }
 
         if ($request->harga_jual <= $request->harga_beli) {
             return ApiResponseClass::sendError('Harga jual tidak boleh kurang dari atau sama dengan harga beli.', 422);
@@ -107,9 +107,9 @@ class ProdukController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('Produk Not Found', 404);
         }
 
-        if (!$loggedInUser->is_admin) {
-            return ApiResponseClass::sendError('Unauthorized Access', 403);
-        }
+        // if (!$loggedInUser->is_admin) {
+        //     return ApiResponseClass::sendError('Unauthorized Access', 403);
+        // }
 
         $updateDetails = [
             'kode_produk' => $request->kode_produk ?? $product->kode_produk,
@@ -150,9 +150,9 @@ class ProdukController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('Product Not Found', 404);
         }
 
-        if (!$loggedInUser->is_admin) {
-            return ApiResponseClass::sendError('Unauthorized Access', 403);
-        }
+        // if (!$loggedInUser->is_admin) {
+        //     return ApiResponseClass::sendError('Unauthorized Access', 403);
+        // }
 
         $path = $product->foto;
         if (Storage::disk('public')->exists($path)) {
