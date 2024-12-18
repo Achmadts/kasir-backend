@@ -106,10 +106,11 @@ class UserController extends Controller implements HasMiddleware
         $loggedInUser = Auth::user();
         $user = $this->userRepositoryInterface->getById($id);
 
-        if (!$user) {
-            return ApiResponseClass::sendError('User  Not Found', 404);
+        if (!$user || $user->id !== $loggedInUser) {
+            return ApiResponseClass::sendError('User Not Found', 404);
         }
-        if ($loggedInUser->id !== $user->id && !$loggedInUser->is_admin) {
+
+        if ($loggedInUser->id !== $user->id) {
             return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
@@ -178,6 +179,7 @@ class UserController extends Controller implements HasMiddleware
         if (!$user || $user->id !== $loggedInUserId) {
             return ApiResponseClass::sendError('User Not Found', 404);
         }
+
         $this->userRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('User Delete Successful', '', 204);
     }

@@ -46,12 +46,6 @@ class ProdukController extends Controller implements HasMiddleware
 
     public function store(StoreProdukRequest $request)
     {
-        $loggedInUser = Auth::user();
-
-        // if (!$loggedInUser->is_admin) {
-        //     return ApiResponseClass::sendError('Unauthorized Access', 403);
-        // }
-
         if ($request->harga_jual <= $request->harga_beli) {
             return ApiResponseClass::sendError('Harga jual tidak boleh kurang dari atau sama dengan harga beli.', 422);
         }
@@ -107,10 +101,6 @@ class ProdukController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('Produk Not Found', 404);
         }
 
-        // if (!$loggedInUser->is_admin) {
-        //     return ApiResponseClass::sendError('Unauthorized Access', 403);
-        // }
-
         $updateDetails = [
             'kode_produk' => $request->kode_produk ?? $product->kode_produk,
             'nama_produk' => $request->nama_produk ?? $product->nama_produk,
@@ -149,10 +139,6 @@ class ProdukController extends Controller implements HasMiddleware
         if (!$product) {
             return ApiResponseClass::sendError('Product Not Found', 404);
         }
-
-        // if (!$loggedInUser->is_admin) {
-        //     return ApiResponseClass::sendError('Unauthorized Access', 403);
-        // }
 
         $path = $product->foto;
         if (Storage::disk('public')->exists($path)) {
