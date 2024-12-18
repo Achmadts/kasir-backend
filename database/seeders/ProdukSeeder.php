@@ -15,9 +15,13 @@ class ProdukSeeder extends Seeder
     {
         for ($i = 1; $i <= 15; $i++) {
             DB::table('produks')->insert([
-                'nama_produk' => 'Produk  ' . $i,
-                'harga' => str_pad(random_int(1, 99999999), 8, '0', STR_PAD_LEFT),
+                'kode_produk' => 'Prod-'. $i,
+                'nama_produk' => 'Produk ' . $i,
+                'harga_beli' => str_pad(random_int(1, 99999999), 8, '0', STR_PAD_LEFT),
+                'harga_jual' => str_pad(random_int(1, 99999999), 8, '0', STR_PAD_LEFT),
                 'stok' => str_pad(random_int(1, 999), 3, '0', STR_PAD_LEFT),
+                'deskripsi' => 'Deskripsi Produk ' . $i,
+                'foto' => 'storage/images/produk' . $i,
                 'kategori_id' => $i
             ]);
         }

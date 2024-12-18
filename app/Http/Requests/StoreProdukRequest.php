@@ -24,9 +24,14 @@ class StoreProdukRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'kode_produk' => 'required',
             'nama_produk' => 'required',
-            'harga' => 'required|numeric',
-            'stok' => 'required|integer'
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'stok' => 'required|integer',
+            'deskripsi' => 'nullable',
+            'kategori_id' => 'required|exists:kategoris,id',
+            'foto' => 'required|mimes:png,jpg,jpeg',
         ];
     }
     public function failedValidation(Validator $validator)

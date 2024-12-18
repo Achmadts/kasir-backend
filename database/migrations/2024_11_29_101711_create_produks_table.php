@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('produks', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_produk', 255);
             $table->string('nama_produk', 255);
-            $table->integer("harga");
+            $table->integer("harga_beli");
+            $table->integer("harga_jual");
             $table->integer('stok');
+            $table->text('deskripsi')->nullable();
+            $table->string('foto');
             $table->foreignId("kategori_id")->references("id")->on('kategoris')->onDelete("cascade")->onUpdate("cascade");
             $table->timestamps();
         });

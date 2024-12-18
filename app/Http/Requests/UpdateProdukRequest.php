@@ -24,8 +24,14 @@ class UpdateProdukRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'harga' => 'numeric',
-            'stok' => 'integer'
+            // 'kode_produk' => 'required',
+            // 'nama_produk' => 'required',
+            'harga_beli' => 'numeric',
+            'harga_jual' => 'numeric',
+            'stok' => 'integer',
+            // 'deskripsi' => 'nullable',
+            'kategori_id' => 'exists:kategoris,id',
+            'foto' => 'mimes:png,jpg,jpeg',
         ];
     }
     public function failedValidation(Validator $validator)
