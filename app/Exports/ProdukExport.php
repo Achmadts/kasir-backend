@@ -13,10 +13,10 @@ class ProdukExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return Produk::select('nama_produk', 'harga', 'stok', 'kategori_id')->get();
+        return Produk::select('kode_produk', 'nama_produk', 'harga_beli', 'harga_jual', 'stok', 'deskripsi', 'foto', 'kategori_id')->get();
     }
     public function headings(): array
     {
-        return ["Nama Produk", "Harga", "Stok", "Kategori ID"];
+        return ["Kode Produk", "Nama Produk", "Harga Beli", "Harga Jual", "Stok", "Deskripsi", "Foto", "Kategori ID"];
     }
 }

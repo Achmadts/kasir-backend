@@ -106,7 +106,7 @@ class UserController extends Controller implements HasMiddleware
         $loggedInUser = Auth::user();
         $user = $this->userRepositoryInterface->getById($id);
 
-        if (!$user || $user->id !== $loggedInUser) {
+        if (!$user) {
             return ApiResponseClass::sendError('User Not Found', 404);
         }
 
