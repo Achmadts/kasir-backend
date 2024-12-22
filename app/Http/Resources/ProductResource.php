@@ -22,6 +22,7 @@ class ProductResource extends JsonResource
             'harga_jual' => $this->harga_jual,
             'stok' => $this->stok,
             'deskripsi' => $this->deskripsi,
+            'kategori_id' => $this->kategori_id,
             'foto' => $this->foto ? url('storage/' . $this->foto) : null,
         ];
     }
