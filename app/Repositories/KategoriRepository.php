@@ -10,9 +10,14 @@ class KategoriRepository implements KategoriRepositoryInterface
     public function index($perPage, $searchTerm = '')
     {
         $query = Kategori::query();
+
         if ($searchTerm) {
-            $query->where('nama_kategori', 'like', '%' . $searchTerm . '%');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('nama_kategori', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('kode_kategori', 'like', '%' . $searchTerm . '%');
+            });
         }
+
         return $query->paginate($perPage);
     }
 

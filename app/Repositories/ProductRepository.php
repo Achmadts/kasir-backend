@@ -10,9 +10,14 @@ class ProductRepository implements ProductRepositoryInterface
     public function index($perPage, $searchTerm = '')
     {
         $query = Produk::query();
+
         if ($searchTerm) {
-            $query->where('nama_produk', 'like', '%' . $searchTerm . '%');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('nama_produk', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('kode_produk', 'like', '%' . $searchTerm . '%');
+            });
         }
+
         return $query->paginate($perPage);
     }
 
