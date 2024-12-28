@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdatePenjualanRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdatePenjualanRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,29 @@ class UpdatePenjualanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nama_pelanggan' => 'string|max:255',
+            'id_produk' => 'array',
+            'id_produk.*' => 'exists:produks,id',
+            'jumlah_produk' => 'array',
+            'jumlah_produk.*' => 'integer|min:1',
+            'sub_total' => 'array',
+            'sub_total.*' => 'numeric|min:0',
+            'tanggal_penjualan' => 'date',
+            'quantity' => 'integer|min:1',
+            'pajak' => 'numeric|min:0',
+            'diskon' => 'numeric|min:0',
+            'total_harga' => 'numeric|min:0',
+            'status' => 'in:Pending,Completed,Cancelled',
+            'metode_pembayaran' => 'in:Cash,Credit Card,Bank Transfer',
+            'catatan' => 'nullable|string',
         ];
+    }
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors()
+        ]));
     }
 }

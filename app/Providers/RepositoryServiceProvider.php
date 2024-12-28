@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Interfaces\KategoriRepositoryInterface;
+use App\Interfaces\PenjualanRepositoryInterface;
 use App\Repositories\KategoriRepository;
+use App\Repositories\PenjualanRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +22,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(KategoriRepositoryInterface::class, KategoriRepository::class);
+        $this->app->bind(PenjualanRepositoryInterface::class, PenjualanRepository::class);
     }
 
     /**

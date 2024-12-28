@@ -15,6 +15,11 @@ class Produk extends Model
         return $this->belongsTo(DetailPenjualan::class);
     }
 
+    public function penjualan()
+    {
+        return $this->belongsTo(Penjualan::class, 'produk_id', 'id');
+    }
+
     public function kategoris()
     {
         return $this->belongsTo(Kategori::class);

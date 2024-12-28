@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PenjualanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckJwtToken;
 use App\Http\Controllers\UserController;
@@ -19,8 +20,9 @@ Route::group(['middleware' => [CheckJwtToken::class, 'auth:api']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name("dashboard");
 
     Route::resource('users', UserController::class);
-    Route::resource('produk', ProdukController::class);
     Route::resource('kategori', KategoriController::class);
+    Route::resource('produk', ProdukController::class);
+    Route::resource('penjualan', PenjualanController::class);
 
     Route::get('kategori-export', [KategoriController::class, 'export'])->name('kategori.export');
     Route::get('produk-export', [ProdukController::class, 'export'])->name('produk.export');

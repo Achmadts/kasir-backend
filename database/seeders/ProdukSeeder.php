@@ -17,8 +17,8 @@ class ProdukSeeder extends Seeder
             DB::table('produks')->insert([
                 'kode_produk' => 'Prod-'. $i,
                 'nama_produk' => 'Produk ' . $i,
-                'harga_beli' => str_pad(random_int(1, 99999999), 8, '0', STR_PAD_LEFT),
-                'harga_jual' => str_pad(random_int(1, 99999999), 8, '0', STR_PAD_LEFT),
+                'harga_beli' => str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+                'harga_jual' => str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
                 'stok' => str_pad(random_int(1, 999), 3, '0', STR_PAD_LEFT),
                 'deskripsi' => 'Deskripsi Produk ' . $i,
                 'foto' => 'storage/images/produk' . $i,

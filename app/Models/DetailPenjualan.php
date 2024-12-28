@@ -8,14 +8,15 @@ class DetailPenjualan extends Model
 {
     protected $table = 'detail_penjualans';
     protected $primaryKey = 'id';
-    protected $fillable = ["penjualan_id", "produk_id", "jumlah_produk", "sub_total"];
+    protected $fillable = ["id_penjualan", "id_produk", "jumlah_produk", "sub_total"];
+    public function penjualan()
+    {
+        return $this->belongsTo(Penjualan::class, 'id_penjualan');
+    }
 
-    public function pelanggans()
+    public function produk()
     {
-        return $this->belongsTo(Pelanggan::class);
+        return $this->belongsTo(Produk::class, 'id_produk');
     }
-    public function produks()
-    {
-        return $this->hasMany(Produk::class);
-    }
+
 }

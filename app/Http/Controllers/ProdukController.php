@@ -8,7 +8,7 @@ use App\Classes\ApiResponseClass;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\ProductRepositoryInterface;
-use Illuminate\Support\Facades\{DB, Auth, Storage};
+use Illuminate\Support\Facades\{DB, Storage};
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 use App\Http\Requests\{StoreProdukRequest, UpdateProdukRequest};
@@ -94,7 +94,6 @@ class ProdukController extends Controller implements HasMiddleware
 
     public function update(UpdateProdukRequest $request, $id)
     {
-        $loggedInUser = Auth::user();
         $product = $this->productRepositoryInterface->getById($id);
 
         if (!$product || !is_object($product)) {
@@ -133,7 +132,6 @@ class ProdukController extends Controller implements HasMiddleware
 
     public function destroy($id)
     {
-        $loggedInUser = Auth::user();
         $product = $this->productRepositoryInterface->getById($id);
 
         if (!$product) {
