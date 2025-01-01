@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Produk;
 use App\Models\Penjualan;
 use Illuminate\Http\Request;
 use App\Classes\ApiResponseClass;
@@ -65,17 +66,35 @@ class PenjualanController extends Controller implements HasMiddleware
             ]);
 
             $detailPenjualans = [];
+
             foreach ($request->id_produk as $index => $id_produk) {
+                $jumlah_produk = $request->jumlah_produk[$index];
+                $product = DB::table('produks')->where('id', $id_produk)->first();
+
+                if (!$product) {
+                    return ApiResponseClass::sendError("Product not found!", 404);
+                }
+
+                if ($product->stok < $jumlah_produk) {
+                    return ApiResponseClass::sendError("Stok produk {$product->nama_produk} tidak mencukupi!", 422);
+                }
+
+                DB::table('produks')
+                    ->where('id', $id_produk)
+                    ->decrement('stok', $jumlah_produk);
+
                 $detailPenjualans[] = [
                     'id_penjualan' => $penjualan,
                     'id_produk' => $id_produk,
-                    'jumlah_produk' => $request->jumlah_produk[$index],
+                    'jumlah_produk' => $jumlah_produk,
                     'sub_total' => $request->sub_total[$index],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
+
             DB::table('detail_penjualans')->insert($detailPenjualans);
+
             DB::commit();
 
             $penjualanResource = new PenjualanResource(Penjualan::with(['pelanggan', 'detailPenjualans.produk'])->find($penjualan));
@@ -100,7 +119,7 @@ class PenjualanController extends Controller implements HasMiddleware
 
     public function update(UpdatePenjualanRequest $request, $id)
     {
-        $penjualan = Penjualan::with('pelanggan', 'detailPenjualans')->find($id);
+        $penjualan = Penjualan::with('pelanggan', 'detailPenjualans.produk')->find($id);
 
         if (!$penjualan) {
             return ApiResponseClass::sendError('Penjualan Not Found', 404);
@@ -129,33 +148,41 @@ class PenjualanController extends Controller implements HasMiddleware
                 'updated_at' => now(),
             ]);
 
-            if (is_array($request->id_produk ?? []) && !empty($request->id_produk)) {
-                $penjualan->detailPenjualans()->delete();
-
-                $detailPenjualans = [];
-                foreach (($request->id_produk ?? []) as $index => $id_produk) {
-                    $existingDetail = $penjualan->detailPenjualans->where('id_produk', $id_produk)->first();
-
-                    $detailPenjualans[] = [
-                        'id_penjualan' => $penjualan->id
-                            ?? $existingDetail->id_penjualan
-                            ?? null,
-                        'id_produk' => $id_produk
-                            ?? $existingDetail->id_produk
-                            ?? null,
-                        'jumlah_produk' => $request->jumlah_produk[$index]
-                            ?? $existingDetail->jumlah_produk
-                            ?? 0,
-                        'sub_total' => $request->sub_total[$index]
-                            ?? $existingDetail->sub_total
-                            ?? 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+            foreach ($penjualan->detailPenjualans as $detail) {
+                $product = $detail->produk;
+                if ($product) {
+                    $product->increment('stok', $detail->jumlah_produk);
                 }
-                DB::table('detail_penjualans')->insert($detailPenjualans);
             }
 
+            $penjualan->detailPenjualans()->delete();
+            $detailPenjualans = [];
+            foreach (($request->id_produk ?? []) as $index => $id_produk) {
+                $jumlah_produk = $request->jumlah_produk[$index] ?? 0;
+                $sub_total = $request->sub_total[$index] ?? 0;
+                $product = Produk::find($id_produk);
+
+                if ($product) {
+                    if ($jumlah_produk > 0) {
+                        if ($product->stok < $jumlah_produk) {
+                            return ApiResponseClass::sendError("Stok produk {$product->nama_produk} tidak mencukupi!", 422);
+                        }
+
+                        $product->decrement('stok', $jumlah_produk);
+                    }
+                }
+
+                $detailPenjualans[] = [
+                    'id_penjualan' => $penjualan->id,
+                    'id_produk' => $id_produk,
+                    'jumlah_produk' => $jumlah_produk,
+                    'sub_total' => $sub_total,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            DB::table('detail_penjualans')->insert($detailPenjualans);
             DB::commit();
             $penjualanResource = new PenjualanResource(Penjualan::with(['pelanggan', 'detailPenjualans.produk'])->find($penjualan->id));
             return ApiResponseClass::sendResponse($penjualanResource, 'Penjualan Update Successful', 201);

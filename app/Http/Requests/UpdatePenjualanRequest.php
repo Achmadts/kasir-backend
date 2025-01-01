@@ -28,7 +28,7 @@ class UpdatePenjualanRequest extends FormRequest
             'id_produk' => 'array',
             'id_produk.*' => 'exists:produks,id',
             'jumlah_produk' => 'array',
-            'jumlah_produk.*' => 'integer|min:1',
+            'jumlah_produk.*' => 'integer|min:0',
             'sub_total' => 'array',
             'sub_total.*' => 'numeric|min:0',
             'tanggal_penjualan' => 'date',
