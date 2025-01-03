@@ -24,6 +24,8 @@ Route::group(['middleware' => [CheckJwtToken::class, 'auth:api']], function () {
     Route::resource('produk', ProdukController::class);
     Route::resource('penjualan', PenjualanController::class);
 
+    Route::get('/sales-purchases', [PenjualanController::class, 'getSalesPurchases']);
     Route::get('kategori-export', [KategoriController::class, 'export'])->name('kategori.export');
     Route::get('produk-export', [ProdukController::class, 'export'])->name('produk.export');
+    Route::get('penjualan-export', [PenjualanController::class, 'export'])->name('penjualan.export');
 });

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Produk;
 use App\Models\Penjualan;
 use Illuminate\Http\Request;
+use App\Exports\PenjualanExport;
 use App\Classes\ApiResponseClass;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\PenjualanResource;
 use App\Interfaces\PenjualanRepositoryInterface;
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
@@ -29,6 +31,27 @@ class PenjualanController extends Controller implements HasMiddleware
     public function __construct(PenjualanRepositoryInterface $penjualanRepositoryInterface)
     {
         $this->penjualanRepositoryInterface = $penjualanRepositoryInterface;
+    }
+
+    public function export()
+    {
+        return Excel::download(new PenjualanExport, 'penjualans.xlsx');
+    }
+
+    public function getSalesPurchases()
+    {
+        $data = DB::table('penjualans')
+            ->select(
+                DB::raw('DATE(tanggal_penjualan) as date'),
+                DB::raw('SUM(total_harga) as sales'),
+                DB::raw('SUM(quantity) as purchases')
+            )
+            ->where('tanggal_penjualan', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        return response()->json($data);
     }
 
     public function index(Request $request)
@@ -94,9 +117,7 @@ class PenjualanController extends Controller implements HasMiddleware
             }
 
             DB::table('detail_penjualans')->insert($detailPenjualans);
-
             DB::commit();
-
             $penjualanResource = new PenjualanResource(Penjualan::with(['pelanggan', 'detailPenjualans.produk'])->find($penjualan));
             return ApiResponseClass::sendResponse($penjualanResource, 'Penjualan Create Successful', 201);
 

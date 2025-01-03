@@ -22,7 +22,7 @@ class PenjualanSeeder extends Seeder
 
             $penjualanId = DB::table('penjualans')->insertGetId([
                 'id_pelanggan' => $pelangganId,
-                'tanggal_penjualan' => "2024-12-" .$i,
+                'tanggal_penjualan' => "2025-01-" .$i,
                 'quantity' => $i,
                 'pajak' => random_int(1000, 999999),
                 'diskon' => random_int(1000, 999999),
