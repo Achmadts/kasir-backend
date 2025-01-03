@@ -161,11 +161,10 @@ class PenjualanController extends Controller implements HasMiddleware
                 $jumlah_produk = $request->jumlah_produk[$index] ?? 0;
                 $sub_total = $request->sub_total[$index] ?? 0;
                 $product = Produk::find($id_produk);
-
                 if ($product) {
                     if ($jumlah_produk > 0) {
                         if ($product->stok < $jumlah_produk) {
-                            return ApiResponseClass::sendError("Stok produk {$product->nama_produk} tidak mencukupi!", 422);
+                            return ApiResponseClass::sendError("Stok produk {$product->nama_produk} tidak cukup! Qty maksimal {$product->stok}", 422);
                         }
 
                         $product->decrement('stok', $jumlah_produk);

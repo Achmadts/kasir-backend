@@ -16,7 +16,8 @@ class PenjualanRepository implements PenjualanRepositoryInterface
                 $q->whereHas('pelanggan', function ($pelangganQuery) use ($searchTerm) {
                     $pelangganQuery->where('nama_pelanggan', 'like', '%' . $searchTerm . '%');
                 })
-                    ->orWhere('tanggal_penjualan', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('tanggal_penjualan', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('status', 'like', '%' . $searchTerm . '%');
             });
         }
 
