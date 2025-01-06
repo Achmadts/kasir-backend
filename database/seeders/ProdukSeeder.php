@@ -13,7 +13,7 @@ class ProdukSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 15; $i++) {
+        for ($i = 1; $i <= 30; $i++) {
             DB::table('produks')->insert([
                 'kode_produk' => 'Prod-'. $i,
                 'nama_produk' => 'Produk ' . $i,

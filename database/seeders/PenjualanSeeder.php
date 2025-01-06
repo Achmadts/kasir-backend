@@ -13,7 +13,17 @@ class PenjualanSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 15; $i++) {
+        for ($i = 1; $i <= 30; $i++) {
+            $quantity = $i;
+
+            if ($i === 29) {
+                $quantity = 0;
+            }
+
+            if ($i === 30) {
+                $quantity = -10;
+            }
+
             $pelangganId = DB::table('pelanggans')->insertGetId([
                 'nama_pelanggan' => 'Pelanggan-' . $i,
                 'kota' => 'Karawang',
@@ -23,7 +33,7 @@ class PenjualanSeeder extends Seeder
             $penjualanId = DB::table('penjualans')->insertGetId([
                 'id_pelanggan' => $pelangganId,
                 'tanggal_penjualan' => "2025-01-" .$i,
-                'quantity' => $i,
+                'quantity' => $quantity,
                 'pajak' => random_int(1000, 999999),
                 'diskon' => random_int(1000, 999999),
                 'total_harga' => random_int(1000, 999999),

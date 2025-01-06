@@ -44,7 +44,7 @@ class PenjualanController extends Controller implements HasMiddleware
             ->select(
                 DB::raw('DATE(tanggal_penjualan) as date'),
                 DB::raw('SUM(total_harga) as sales'),
-                DB::raw('SUM(quantity) as purchases')
+                DB::raw('SUM(quantity) as sales') // purchases ini nantinya harus diganti jadi sales setelah ada purchases controller
             )
             ->where('tanggal_penjualan', '>=', now()->subDays(7))
             ->groupBy('date')
