@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Interfaces\KategoriRepositoryInterface;
+use App\Interfaces\PembelianRepositoryInterface;
 use App\Interfaces\PenjualanRepositoryInterface;
 use App\Repositories\KategoriRepository;
+use App\Repositories\PembelianRepository;
 use App\Repositories\PenjualanRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\ProductRepository;
@@ -23,6 +25,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(KategoriRepositoryInterface::class, KategoriRepository::class);
         $this->app->bind(PenjualanRepositoryInterface::class, PenjualanRepository::class);
+        $this->app->bind(PembelianRepositoryInterface::class, PembelianRepository::class);
     }
 
     /**

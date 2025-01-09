@@ -19,6 +19,10 @@ class Produk extends Model
     {
         return $this->belongsTo(Penjualan::class, 'produk_id', 'id');
     }
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class, 'produk_id', 'id');
+    }
 
     public function kategoris()
     {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PenjualanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckJwtToken;
@@ -23,9 +24,11 @@ Route::group(['middleware' => [CheckJwtToken::class, 'auth:api']], function () {
     Route::resource('kategori', KategoriController::class);
     Route::resource('produk', ProdukController::class);
     Route::resource('penjualan', PenjualanController::class);
+    Route::resource('pembelian', PembelianController::class);
 
     Route::get('/sales-purchases', [PenjualanController::class, 'getSalesPurchases']);
     Route::get('kategori-export', [KategoriController::class, 'export'])->name('kategori.export');
     Route::get('produk-export', [ProdukController::class, 'export'])->name('produk.export');
     Route::get('penjualan-export', [PenjualanController::class, 'export'])->name('penjualan.export');
+    Route::get('pembelian-export', [PembelianController::class, 'export'])->name('pembelian.export');
 });
