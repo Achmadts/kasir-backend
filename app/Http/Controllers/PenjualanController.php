@@ -43,15 +43,35 @@ class PenjualanController extends Controller implements HasMiddleware
         $data = DB::table('penjualans')
             ->select(
                 DB::raw('DATE(tanggal_penjualan) as date'),
-                DB::raw('SUM(total_harga) as sales'),
-                DB::raw('SUM(quantity) as sales') // purchases ini nantinya harus diganti jadi sales setelah ada purchases controller
+                DB::raw('SUM(total_harga) as total_sales'),
+                DB::raw('SUM(quantity) as total_sales_quantity')
             )
             ->where('tanggal_penjualan', '>=', now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
+            ->groupBy('date');
+
+        $purchaseData = DB::table('pembelians')
+            ->select(
+                DB::raw('DATE(date) as date'),
+                DB::raw('SUM(total_pembayaran) as total_purchases'),
+                DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
+            )
+            ->where('date', '>=', now()->subDays(7))
+            ->groupBy('date');
+
+        $combinedData = DB::query()
+            ->fromSub($data, 'sales')
+            ->joinSub($purchaseData, 'purchases', 'sales.date', '=', 'purchases.date')
+            ->select(
+                'sales.date',
+                'sales.total_sales',
+                'sales.total_sales_quantity',
+                'purchases.total_purchases',
+                'purchases.total_purchases_quantity'
+            )
+            ->orderBy('sales.date', 'asc')
             ->get();
 
-        return response()->json($data);
+        return response()->json($combinedData);
     }
 
     public function index(Request $request)
