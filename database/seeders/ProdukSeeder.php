@@ -13,17 +13,17 @@ class ProdukSeeder extends Seeder
      */
     public function run(): void
     {
-        // for ($i = 1; $i <= 30; $i++) {
-        //     DB::table('produks')->insert([
-        //         'kode_produk' => 'Prod-'. $i,
-        //         'nama_produk' => 'Produk ' . $i,
-        //         'harga_beli' => str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
-        //         'harga_jual' => str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
-        //         'stok' => $i,
-        //         'deskripsi' => 'Deskripsi Produk ' . $i,
-        //         'foto' => 'storage/images/produk' . $i,
-        //         'kategori_id' => $i
-        //     ]);
-        // }
+        for ($i = 1; $i <= 30; $i++) {
+            DB::table('produks')->insert([
+                'kode_produk' => 'Prod-'. $i,
+                'nama_produk' => 'Produk ' . $i,
+                'harga_beli' => str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+                'harga_jual' => str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+                'stok' => $i,
+                'deskripsi' => 'Deskripsi Produk ' . $i,
+                'foto' => 'storage/images/produk' . $i,
+                'kategori_id' => $i
+            ]);
+        }
     }
 }

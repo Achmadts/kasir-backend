@@ -38,16 +38,32 @@ class PenjualanController extends Controller implements HasMiddleware
         return Excel::download(new PenjualanExport, 'penjualans.xlsx');
     }
 
-    public function getSalesPurchases()
+    public function getSalesPurchases(Request $request)
     {
-        $data = DB::table('penjualans')
+        $days = $request->query('days', 7);
+
+        if (!is_numeric($days) || $days <= 0) {
+            return response()->json(['error' => 'Invalid days parameter'], 400);
+        }
+
+        $startDate = now()->subDays($days)->startOfDay();
+        $salesData = DB::table('penjualans')
             ->select(
                 DB::raw('DATE(tanggal_penjualan) as date'),
                 DB::raw('SUM(total_harga) as total_sales'),
                 DB::raw('SUM(quantity) as total_sales_quantity')
             )
-            ->where('tanggal_penjualan', '>=', now()->subDays(7))
-            ->groupBy('date');
+            ->where('tanggal_penjualan', '>=', $startDate)
+            ->groupBy(DB::raw('DATE(tanggal_penjualan)'))
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($sale) {
+                return [
+                    'date' => $sale->date,
+                    'total_sales' => (string) $sale->total_sales,
+                    'total_sales_quantity' => (string) $sale->total_sales_quantity,
+                ];
+            });
 
         $purchaseData = DB::table('pembelians')
             ->select(
@@ -55,23 +71,22 @@ class PenjualanController extends Controller implements HasMiddleware
                 DB::raw('SUM(total_pembayaran) as total_purchases'),
                 DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
             )
-            ->where('date', '>=', now()->subDays(7))
-            ->groupBy('date');
+            ->where('date', '>=', $startDate)
+            ->groupBy(DB::raw('DATE(date)'))
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($purchase) {
+                return [
+                    'date' => $purchase->date,
+                    'total_purchases' => (string) $purchase->total_purchases,
+                    'total_purchases_quantity' => (string) $purchase->total_purchases_quantity,
+                ];
+            });
 
-        $combinedData = DB::query()
-            ->fromSub($data, 'sales')
-            ->joinSub($purchaseData, 'purchases', 'sales.date', '=', 'purchases.date')
-            ->select(
-                'sales.date',
-                'sales.total_sales',
-                'sales.total_sales_quantity',
-                'purchases.total_purchases',
-                'purchases.total_purchases_quantity'
-            )
-            ->orderBy('sales.date', 'asc')
-            ->get();
-
-        return response()->json($combinedData);
+        return response()->json([
+            'sales' => $salesData,
+            'purchases' => $purchaseData,
+        ]);
     }
 
     public function index(Request $request)

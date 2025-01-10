@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string("jumlah_barang");
             $table->enum("status", ['Success', 'Completed', 'Cancel']);
             $table->enum("payment_method", ['Cash', 'Credit Card', 'Bank Transfer']);
-            $table->string("total_pembayaran");
+            $table->integer("total_pembayaran");
             $table->string("note")->nullable();
             $table->foreignId("id_produk")->references("id")->on('produks')->onDelete("cascade")->onUpdate("cascade");
             $table->timestamps();
