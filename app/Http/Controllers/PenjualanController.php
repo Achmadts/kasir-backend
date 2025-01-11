@@ -40,48 +40,52 @@ class PenjualanController extends Controller implements HasMiddleware
 
     public function getSalesPurchases(Request $request)
     {
-        $days = $request->query('days', 7);
+        $days = $request->query('days');
 
-        if (!is_numeric($days) || $days <= 0) {
+        if (!is_numeric($days)) {
             return response()->json(['error' => 'Invalid days parameter'], 400);
         }
 
-        $startDate = now()->subDays($days)->startOfDay();
-        $salesData = DB::table('penjualans')
+        $salesQuery = DB::table('penjualans')
             ->select(
                 DB::raw('DATE(tanggal_penjualan) as date'),
                 DB::raw('SUM(total_harga) as total_sales'),
                 DB::raw('SUM(quantity) as total_sales_quantity')
             )
-            ->where('tanggal_penjualan', '>=', $startDate)
             ->groupBy(DB::raw('DATE(tanggal_penjualan)'))
-            ->orderBy('date', 'asc')
-            ->get()
-            ->map(function ($sale) {
-                return [
-                    'date' => $sale->date,
-                    'total_sales' => (string) $sale->total_sales,
-                    'total_sales_quantity' => (string) $sale->total_sales_quantity,
-                ];
-            });
+            ->orderBy('date', 'asc');
 
-        $purchaseData = DB::table('pembelians')
+        $purchaseQuery = DB::table('pembelians')
             ->select(
                 DB::raw('DATE(date) as date'),
                 DB::raw('SUM(total_pembayaran) as total_purchases'),
                 DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
             )
-            ->where('date', '>=', $startDate)
             ->groupBy(DB::raw('DATE(date)'))
-            ->orderBy('date', 'asc')
-            ->get()
-            ->map(function ($purchase) {
-                return [
-                    'date' => $purchase->date,
-                    'total_purchases' => (string) $purchase->total_purchases,
-                    'total_purchases_quantity' => (string) $purchase->total_purchases_quantity,
-                ];
-            });
+            ->orderBy('date', 'asc');
+
+        if ($days > 0) {
+            $startDate = now()->subDays($days)->startOfDay();
+            $endDate = now()->endOfDay();
+            $salesQuery->whereBetween('tanggal_penjualan', [$startDate, $endDate]);
+            $purchaseQuery->whereBetween('date', [$startDate, $endDate]);
+        }
+
+        $salesData = $salesQuery->get()->map(function ($sale) {
+            return [
+                'date' => $sale->date,
+                'total_sales' => (string) $sale->total_sales,
+                'total_sales_quantity' => (string) $sale->total_sales_quantity,
+            ];
+        });
+
+        $purchaseData = $purchaseQuery->get()->map(function ($purchase) {
+            return [
+                'date' => $purchase->date,
+                'total_purchases' => (string) $purchase->total_purchases,
+                'total_purchases_quantity' => (string) $purchase->total_purchases_quantity,
+            ];
+        });
 
         return response()->json([
             'sales' => $salesData,
