@@ -46,34 +46,57 @@ class PenjualanController extends Controller implements HasMiddleware
             return response()->json(['error' => 'Invalid days parameter'], 400);
         }
 
-        $salesQuery = DB::table('penjualans')
-            ->select(
-                DB::raw('DATE(tanggal_penjualan) as date'),
-                DB::raw('SUM(total_harga) as total_sales'),
-                DB::raw('SUM(quantity) as total_sales_quantity')
-            )
-            ->groupBy(DB::raw('DATE(tanggal_penjualan)'))
-            ->orderBy('date', 'asc');
+        if ($days == 0) {
+            $groupingFormatSales = 'YEAR(tanggal_penjualan)';
+            $groupingFormatPurchases = 'YEAR(date)';
 
-        $purchaseQuery = DB::table('pembelians')
-            ->select(
-                DB::raw('DATE(date) as date'),
-                DB::raw('SUM(total_pembayaran) as total_purchases'),
-                DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
-            )
-            ->groupBy(DB::raw('DATE(date)'))
-            ->orderBy('date', 'asc');
+            $salesQuery = DB::table('penjualans')
+                ->select(
+                    DB::raw('YEAR(tanggal_penjualan) as period'),
+                    DB::raw('SUM(total_harga) as total_sales'),
+                    DB::raw('SUM(quantity) as total_sales_quantity')
+                )
+                ->groupBy(DB::raw('YEAR(tanggal_penjualan)'))
+                ->orderBy('period', 'asc');
 
-        if ($days > 0) {
+            $purchaseQuery = DB::table('pembelians')
+                ->select(
+                    DB::raw('YEAR(date) as period'),
+                    DB::raw('SUM(total_pembayaran) as total_purchases'),
+                    DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
+                )
+                ->groupBy(DB::raw('YEAR(date)'))
+                ->orderBy('period', 'asc');
+        } else {
+            $groupingFormatSales = $days >= 180 ? 'YEAR(tanggal_penjualan), MONTH(tanggal_penjualan)' : 'DATE(tanggal_penjualan)';
+            $groupingFormatPurchases = $days >= 180 ? 'YEAR(date), MONTH(date)' : 'DATE(date)';
             $startDate = now()->subDays($days)->startOfDay();
             $endDate = now()->endOfDay();
-            $salesQuery->whereBetween('tanggal_penjualan', [$startDate, $endDate]);
-            $purchaseQuery->whereBetween('date', [$startDate, $endDate]);
+
+            $salesQuery = DB::table('penjualans')
+                ->select(
+                    DB::raw($days >= 180 ? 'DATE_FORMAT(tanggal_penjualan, "%Y-%m") as period' : 'DATE(tanggal_penjualan) as period'),
+                    DB::raw('SUM(total_harga) as total_sales'),
+                    DB::raw('SUM(quantity) as total_sales_quantity')
+                )
+                ->whereBetween('tanggal_penjualan', [$startDate, $endDate])
+                ->groupBy(DB::raw($days >= 180 ? 'DATE_FORMAT(tanggal_penjualan, "%Y-%m")' : 'DATE(tanggal_penjualan)'))
+                ->orderBy('period', 'asc');
+
+            $purchaseQuery = DB::table('pembelians')
+                ->select(
+                    DB::raw($days >= 180 ? 'DATE_FORMAT(date, "%Y-%m") as period' : 'DATE(date) as period'),
+                    DB::raw('SUM(total_pembayaran) as total_purchases'),
+                    DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
+                )
+                ->whereBetween('date', [$startDate, $endDate])
+                ->groupBy(DB::raw($days >= 180 ? 'DATE_FORMAT(date, "%Y-%m")' : 'DATE(date)'))
+                ->orderBy('period', 'asc');
         }
 
         $salesData = $salesQuery->get()->map(function ($sale) {
             return [
-                'date' => $sale->date,
+                'period' => $sale->period,
                 'total_sales' => (string) $sale->total_sales,
                 'total_sales_quantity' => (string) $sale->total_sales_quantity,
             ];
@@ -81,7 +104,7 @@ class PenjualanController extends Controller implements HasMiddleware
 
         $purchaseData = $purchaseQuery->get()->map(function ($purchase) {
             return [
-                'date' => $purchase->date,
+                'period' => $purchase->period,
                 'total_purchases' => (string) $purchase->total_purchases,
                 'total_purchases_quantity' => (string) $purchase->total_purchases_quantity,
             ];
