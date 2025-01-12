@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use DateTime;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -13,16 +14,18 @@ class PenjualanSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 30; $i++) {
+        $startDate = new DateTime('2024-01-12');
+
+        for ($i = 1; $i <= 365; $i++) {
             $quantity = $i;
 
-            if ($i === 29) {
-                $quantity = 0;
-            }
+            // if ($i === 29) {
+            //     $quantity = 0;
+            // }
 
-            if ($i === 30) {
-                $quantity = -10;
-            }
+            // if ($i === 30) {
+            //     $quantity = -10;
+            // }
 
             $pelangganId = DB::table('pelanggans')->insertGetId([
                 'nama_pelanggan' => 'Pelanggan-' . $i,
@@ -30,9 +33,12 @@ class PenjualanSeeder extends Seeder
                 'negara' => 'Indonesia',
             ]);
 
+            $tanggalPenjualan = $startDate->format('Y-m-d');
+            $startDate->modify('+1 day');
+
             $penjualanId = DB::table('penjualans')->insertGetId([
                 'id_pelanggan' => $pelangganId,
-                'tanggal_penjualan' => "2025-01-" .$i,
+                'tanggal_penjualan' => $tanggalPenjualan,
                 'quantity' => $quantity,
                 'pajak' => random_int(1000, 999999),
                 'diskon' => random_int(1000, 999999),

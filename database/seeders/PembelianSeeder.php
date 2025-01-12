@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use DateTime;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -12,9 +13,12 @@ class PembelianSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 30; $i++) {
+        $startDate = new DateTime('2024-01-12');
+
+        for ($i = 1; $i <= 365; $i++) {
             $jumlahBarang = $i;
             $totalPembayaran = random_int(1000, 999999);
+
             $produkId = DB::table('produks')->insertGetId([
                 'kode_produk' => 'Prod-' . $i,
                 'nama_produk' => 'Produk ' . $i,
@@ -25,9 +29,12 @@ class PembelianSeeder extends Seeder
                 'stok' => $i,
             ]);
 
+            $tanggalPembelian = $startDate->format('Y-m-d');
+            $startDate->modify('+1 day');
+
             DB::table('pembelians')->insert([
                 'id_produk' => $produkId,
-                'date' => "2025-01-" . $i,
+                'date' => $tanggalPembelian,
                 'nama_supplier' => 'Supplier-' . $i,
                 'tax' => random_int(1000, 999999),
                 'discount' => random_int(1000, 999999),
