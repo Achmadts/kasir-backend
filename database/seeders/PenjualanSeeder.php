@@ -17,16 +17,6 @@ class PenjualanSeeder extends Seeder
         $startDate = new DateTime('2024-01-12');
 
         for ($i = 1; $i <= 365; $i++) {
-            $quantity = $i;
-
-            // if ($i === 29) {
-            //     $quantity = 0;
-            // }
-
-            // if ($i === 30) {
-            //     $quantity = -10;
-            // }
-
             $pelangganId = DB::table('pelanggans')->insertGetId([
                 'nama_pelanggan' => 'Pelanggan-' . $i,
                 'kota' => 'Karawang',
@@ -36,13 +26,17 @@ class PenjualanSeeder extends Seeder
             $tanggalPenjualan = $startDate->format('Y-m-d');
             $startDate->modify('+1 day');
 
+            $totalHarga = random_int(1000, 999999);
+            $pajak = $totalHarga * 0.1;
+            $diskon = $totalHarga * 0.05;
+
             $penjualanId = DB::table('penjualans')->insertGetId([
                 'id_pelanggan' => $pelangganId,
                 'tanggal_penjualan' => $tanggalPenjualan,
-                'quantity' => $quantity,
-                'pajak' => random_int(1000, 999999),
-                'diskon' => random_int(1000, 999999),
-                'total_harga' => random_int(1000, 999999),
+                'quantity' => $i ** 2,
+                'pajak' => $pajak,
+                'diskon' => $diskon,
+                'total_harga' => $totalHarga,
                 'status' => 'Completed',
                 'metode_pembayaran' => 'Cash',
                 'catatan' => 'Catatan ' . $i,

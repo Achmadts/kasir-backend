@@ -32,13 +32,25 @@ class PembelianSeeder extends Seeder
             $tanggalPembelian = $startDate->format('Y-m-d');
             $startDate->modify('+1 day');
 
+            $tax = $totalPembayaran * 0.10;
+            $discount = $totalPembayaran * 0.05;
+            $jumlahPembelian = $jumlahBarang;
+
+            if ($i === 7) {
+                $jumlahPembelian = $jumlahBarang * 20;
+            }
+
+            if ($i > 7) {
+                $jumlahPembelian = $jumlahBarang * 25;
+            }
+
             DB::table('pembelians')->insert([
                 'id_produk' => $produkId,
                 'date' => $tanggalPembelian,
                 'nama_supplier' => 'Supplier-' . $i,
-                'tax' => random_int(1000, 999999),
-                'discount' => random_int(1000, 999999),
-                'jumlah_barang' => $jumlahBarang,
+                'tax' => $tax,
+                'discount' => $discount,
+                'jumlah_barang' => $jumlahPembelian,
                 'status' => 'Completed',
                 'payment_method' => 'Cash',
                 'total_pembayaran' => $totalPembayaran,
