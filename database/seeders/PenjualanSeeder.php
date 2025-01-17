@@ -14,7 +14,7 @@ class PenjualanSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = new DateTime('2024-01-12');
+        $startDate = new DateTime('2024-12-01');
 
         for ($i = 1; $i <= 365; $i++) {
             $pelangganId = DB::table('pelanggans')->insertGetId([

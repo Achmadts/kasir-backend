@@ -60,12 +60,13 @@ class PenjualanController extends Controller implements HasMiddleware
                 ->orderBy('period', 'asc');
 
             $purchaseQuery = DB::table('pembelians')
+                ->join('detail_pembelians', 'pembelians.id', '=', 'detail_pembelians.id_pembelian')
                 ->select(
-                    DB::raw('YEAR(date) as period'),
-                    DB::raw('SUM(total_pembayaran) as total_purchases'),
-                    DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
+                    DB::raw('YEAR(pembelians.date) as period'),
+                    DB::raw('SUM(pembelians.total_pembayaran) as total_purchases'),
+                    DB::raw('SUM(detail_pembelians.jumlah_produk) as total_purchases_quantity')
                 )
-                ->groupBy(DB::raw('YEAR(date)'))
+                ->groupBy(DB::raw('YEAR(pembelians.date)'))
                 ->orderBy('period', 'asc');
         } else {
             $groupingFormatSales = $days >= 180 ? 'YEAR(tanggal_penjualan), MONTH(tanggal_penjualan)' : 'DATE(tanggal_penjualan)';
@@ -84,13 +85,14 @@ class PenjualanController extends Controller implements HasMiddleware
                 ->orderBy('period', 'asc');
 
             $purchaseQuery = DB::table('pembelians')
+                ->join('detail_pembelians', 'pembelians.id', '=', 'detail_pembelians.id_pembelian')
                 ->select(
-                    DB::raw($days >= 180 ? 'DATE_FORMAT(date, "%Y-%m") as period' : 'DATE(date) as period'),
-                    DB::raw('SUM(total_pembayaran) as total_purchases'),
-                    DB::raw('SUM(jumlah_barang) as total_purchases_quantity')
+                    DB::raw($days >= 180 ? 'DATE_FORMAT(pembelians.date, "%Y-%m") as period' : 'DATE(pembelians.date) as period'),
+                    DB::raw('SUM(pembelians.total_pembayaran) as total_purchases'),
+                    DB::raw('SUM(detail_pembelians.jumlah_produk) as total_purchases_quantity')
                 )
-                ->whereBetween('date', [$startDate, $endDate])
-                ->groupBy(DB::raw($days >= 180 ? 'DATE_FORMAT(date, "%Y-%m")' : 'DATE(date)'))
+                ->whereBetween('pembelians.date', [$startDate, $endDate])
+                ->groupBy(DB::raw($days >= 180 ? 'DATE_FORMAT(pembelians.date, "%Y-%m")' : 'DATE(pembelians.date)'))
                 ->orderBy('period', 'asc');
         }
 

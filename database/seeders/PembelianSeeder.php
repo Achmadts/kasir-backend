@@ -13,12 +13,11 @@ class PembelianSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = new DateTime('2024-01-12');
+        $startDate = new DateTime('2024-12-01');
 
         for ($i = 1; $i <= 365; $i++) {
             $jumlahBarang = $i;
             $totalPembayaran = random_int(1000, 999999);
-
             $produkId = DB::table('produks')->insertGetId([
                 'kode_produk' => 'Prod-' . $i,
                 'nama_produk' => 'Produk ' . $i,
@@ -31,7 +30,6 @@ class PembelianSeeder extends Seeder
 
             $tanggalPembelian = $startDate->format('Y-m-d');
             $startDate->modify('+1 day');
-
             $tax = $totalPembayaran * 0.10;
             $discount = $totalPembayaran * 0.05;
             $jumlahPembelian = $jumlahBarang;
@@ -44,13 +42,12 @@ class PembelianSeeder extends Seeder
                 $jumlahPembelian = $jumlahBarang * 25;
             }
 
-            DB::table('pembelians')->insert([
-                'id_produk' => $produkId,
+            $pembelianId = DB::table('pembelians')->insertGetId([
                 'date' => $tanggalPembelian,
                 'nama_supplier' => 'Supplier-' . $i,
                 'tax' => $tax,
+                'quantity' => $jumlahPembelian,
                 'discount' => $discount,
-                'jumlah_barang' => $jumlahPembelian,
                 'status' => 'Completed',
                 'payment_method' => 'Cash',
                 'total_pembayaran' => $totalPembayaran,
@@ -58,6 +55,15 @@ class PembelianSeeder extends Seeder
             ]);
 
             DB::table('produks')->where('id', $produkId)->increment('stok', $jumlahBarang);
+            $subTotal = ($totalPembayaran - $tax - $discount) / $jumlahPembelian;
+            DB::table('detail_pembelians')->insert([
+                'id_pembelian' => $pembelianId,
+                'id_produk' => $produkId,
+                'jumlah_produk' => $jumlahPembelian,
+                'sub_total' => $subTotal,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 }

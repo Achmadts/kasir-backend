@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Classes\ApiResponseClass;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\PembelianResource;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PembelianExport;
 use App\Interfaces\PembelianRepositoryInterface;
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
@@ -29,6 +31,10 @@ class PembelianController extends Controller implements HasMiddleware
         $this->pembelianRepositoryInterface = $pembelianRepositoryInterface;
     }
 
+    public function export()
+    {
+        return Excel::download(new PembelianExport, 'pembelians.xlsx');
+    }
 
     public function index(Request $request)
     {
@@ -41,22 +47,37 @@ class PembelianController extends Controller implements HasMiddleware
     public function store(StorePembelianRequest $request)
     {
         $details = [
-            'id_produk' => $request->id_produk,
             'date' => $request->date,
             'nama_supplier' => $request->nama_supplier,
             'tax' => $request->tax,
             'discount' => $request->discount,
-            'jumlah_barang' => $request->jumlah_barang,
             'status' => $request->status,
             'payment_method' => $request->payment_method,
             'total_pembayaran' => $request->total_pembayaran,
-            'note' => $request->note
+            'note' => $request->note,
+            'quantity' => $request->quantity,
         ];
 
         DB::beginTransaction();
         try {
             $pembelian = $this->pembelianRepositoryInterface->store($details);
-            DB::table('produks')->where('id', $request->id_produk)->increment('stok', $request->jumlah_barang);
+            $idProduks = $request->id_produk;
+            $jumlahProduks = $request->jumlah_produk;
+            $subTotals = $request->sub_total;
+
+            foreach ($idProduks as $index => $idProduk) {
+                $stokIncrement = $jumlahProduks[$index] ?? 0;
+                DB::table('produks')->where('id', $idProduk)->increment('stok', $stokIncrement);
+                DB::table('detail_pembelians')->insert([
+                    'id_pembelian' => $pembelian->id,
+                    'id_produk' => $idProduk,
+                    'jumlah_produk' => $stokIncrement,
+                    'sub_total' => $subTotals[$index] ?? 0,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+
             DB::commit();
             return ApiResponseClass::sendResponse(new PembelianResource($pembelian), 'Pembelian Created Successfully', 201);
         } catch (\Exception $ex) {
@@ -64,7 +85,6 @@ class PembelianController extends Controller implements HasMiddleware
             return ApiResponseClass::rollback($ex);
         }
     }
-
     public function show($id)
     {
         $pembelian = $this->pembelianRepositoryInterface->getById($id);

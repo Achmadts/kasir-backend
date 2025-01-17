@@ -17,12 +17,11 @@ return new class extends Migration
             $table->string('nama_supplier');
             $table->decimal("tax", 10, 2);
             $table->decimal("discount", 10, 2)->nullable();
-            $table->string("jumlah_barang");
-            $table->enum("status", ['Success', 'Completed', 'Cancel']);
+            $table->integer("quantity");
+            $table->enum("status", ['Pending', 'Completed']);
             $table->enum("payment_method", ['Cash', 'Credit Card', 'Bank Transfer']);
             $table->integer("total_pembayaran");
             $table->string("note")->nullable();
-            $table->foreignId("id_produk")->references("id")->on('produks')->onDelete("cascade")->onUpdate("cascade");
             $table->timestamps();
         });
     }
