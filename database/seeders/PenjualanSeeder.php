@@ -14,9 +14,11 @@ class PenjualanSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = new DateTime('2024-12-01');
+        $startDate = new DateTime('2024-01-17');
 
-        for ($i = 1; $i <= 365; $i++) {
+        for ($i = 1; $i <= 1825; $i++) {
+            $produk = DB::table('produks')->where('id', $i)->first();
+
             $pelangganId = DB::table('pelanggans')->insertGetId([
                 'nama_pelanggan' => 'Pelanggan-' . $i,
                 'kota' => 'Karawang',
@@ -25,15 +27,15 @@ class PenjualanSeeder extends Seeder
 
             $tanggalPenjualan = $startDate->format('Y-m-d');
             $startDate->modify('+1 day');
-
-            $totalHarga = random_int(1000, 999999);
+            $jumlahBarang = random_int(1, 50);
+            $hargaJual = random_int(7000, 10000);
+            $totalHarga = $jumlahBarang * $hargaJual;
             $pajak = $totalHarga * 0.1;
             $diskon = $totalHarga * 0.05;
-
             $penjualanId = DB::table('penjualans')->insertGetId([
                 'id_pelanggan' => $pelangganId,
                 'tanggal_penjualan' => $tanggalPenjualan,
-                'quantity' => $i ** 2,
+                'quantity' => $jumlahBarang,
                 'pajak' => $pajak,
                 'diskon' => $diskon,
                 'total_harga' => $totalHarga,
@@ -44,9 +46,9 @@ class PenjualanSeeder extends Seeder
 
             DB::table('detail_penjualans')->insert([
                 'id_penjualan' => $penjualanId,
-                'id_produk' => $i,
-                'jumlah_produk' => $i,
-                'sub_total' => random_int(1000, 999999),
+                'id_produk' => $produk->id,
+                'jumlah_produk' => $jumlahBarang,
+                'sub_total' => ($totalHarga - $pajak - $diskon) / $jumlahBarang,
             ]);
         }
     }
