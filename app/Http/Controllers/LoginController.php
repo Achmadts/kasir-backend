@@ -29,15 +29,22 @@ class LoginController extends Controller
         try {
             $accessToken = JWTAuth::fromUser($user);
             $refreshToken = JWTAuth::fromUser($user);
-
             return response()->json([
                 'success' => true,
                 'token' => $accessToken,
-                'message' => "Login berhasil"
+                'message' => "Login berhasil",
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'is_admin' => $user->is_admin,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                ]
             ])->cookie(
                     'refresh_token',
                     $refreshToken,
-                    2592000, // 30 hari dalam detik
+                    2592000, // 30 days in seconds
                     '/',
                     null,
                     true,
@@ -47,7 +54,7 @@ class LoginController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Login gagal, coba lagi.',
-            ], 401);
+            ], 500);
         }
     }
 
