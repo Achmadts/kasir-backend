@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
+use App\Exports\CashierExport;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\UserResource;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Interfaces\UserRepositoryInterface;
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use Illuminate\Support\Facades\{DB, Storage, Auth, Hash};
@@ -27,10 +30,18 @@ class UserController extends Controller implements HasMiddleware
     {
         $this->userRepositoryInterface = $userRepositoryInterface;
     }
-    public function index()
+
+    public function export()
     {
-        $user = $this->userRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(UserResource::collection($user), '', 200);
+        return Excel::download(new CashierExport, 'cashiers.xlsx');
+    }
+
+    public function index(Request $request)
+    {
+        $perPage = $request->input('per_page', 200);
+        $searchTerm = $request->input('searchTerm', '');
+        $user = $this->userRepositoryInterface->index($perPage, $searchTerm);
+        return ApiResponseClass::sendResponse(UserResource::collection($user)->response()->getData(true), '', 200);
     }
 
     public function store(StoreUserRequest $request)
@@ -143,13 +154,21 @@ class UserController extends Controller implements HasMiddleware
     public function destroy($id)
     {
         $user = $this->userRepositoryInterface->getById($id);
-        $loggedInUserId = Auth::id();
+        $loggedInUser = Auth::user();
 
-        if (!$user || $user->id !== $loggedInUserId) {
-            return ApiResponseClass::sendError('User Not Found', 404);
+        if (!$loggedInUser) {
+            return ApiResponseClass::sendError('Unauthorized Access', 401);
+        }
+
+        if ($loggedInUser->id === $user->id) {
+            return ApiResponseClass::sendError('You cannot delete your own account.', 403);
+        }
+
+        if ($loggedInUser->is_admin !== 1) {
+            return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
         $this->userRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('User Delete Successful', '', 204);
+        return ApiResponseClass::sendResponse('User Delete Successful', 204);
     }
 }

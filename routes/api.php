@@ -32,4 +32,5 @@ Route::group(['middleware' => [CheckJwtToken::class, 'auth:api']], function () {
     Route::get('produk-export', [ProdukController::class, 'export'])->name('produk.export');
     Route::get('penjualan-export', [PenjualanController::class, 'export'])->name('penjualan.export');
     Route::get('pembelian-export', [PembelianController::class, 'export'])->name('pembelian.export');
+    Route::get('cashier-export', [UserController::class, 'export'])->name('user.export');
 });

@@ -7,9 +7,19 @@ use App\Interfaces\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function index()
+    public function index($perPage, $searchTerm = '')
     {
-        return User::all();
+        $query = User::query();
+
+        if ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('is_admin', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function getById($id)
