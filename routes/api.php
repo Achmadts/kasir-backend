@@ -1,15 +1,16 @@
 <?php
 
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\PembelianController;
-use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\{
+    LoginController,
+    UserController,
+    DashboardController,
+    KategoriController,
+    PembelianController,
+    PenjualanController,
+    ProdukController
+};
+use App\Http\Middleware\{CheckJwtToken, RedirectIfAuthenticatedApi};
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\CheckJwtToken;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Middleware\RedirectIfAuthenticatedApi;
 
 Route::post('/authenticate', [LoginController::class, 'index'])->name('authenticate')->middleware(RedirectIfAuthenticatedApi::class);
 Route::get('/login', [LoginController::class, 'getUser'])->name('login')->middleware(RedirectIfAuthenticatedApi::class);

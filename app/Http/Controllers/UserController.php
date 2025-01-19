@@ -13,17 +13,13 @@ use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
 
 class UserController extends Controller implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
     private UserRepositoryInterface $userRepositoryInterface;
-
     public static function middleware(): array
     {
         return [
             'auth:api',
             new Middleware(CheckJwtToken::class, only: ['index', 'show', 'store', 'update', 'destroy']), //opsional
-            new Middleware(CheckAdmin::class, only: ['destroy', 'store']), // method yang tidak boleh diakses oleh is_admin === 0
+            new Middleware(CheckAdmin::class, only: ['destroy', 'store', "index"]), // method yang tidak boleh diakses oleh is_admin === 0
         ];
     }
 
@@ -37,17 +33,6 @@ class UserController extends Controller implements HasMiddleware
         return ApiResponseClass::sendResponse(UserResource::collection($user), '', 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreUserRequest $request)
     {
         $imagePath = null;
@@ -58,6 +43,7 @@ class UserController extends Controller implements HasMiddleware
         $details = [
             'name' => $request->name,
             'email' => $request->email,
+            'is_admin' => $request->is_admin,
             'password' => bcrypt($request->password),
             'images' => $imagePath,
         ];
@@ -75,9 +61,6 @@ class UserController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $user = $this->userRepositoryInterface->getById($id);
@@ -90,17 +73,6 @@ class UserController extends Controller implements HasMiddleware
         return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateUserRequest $request, $id)
     {
         $loggedInUser = Auth::user();
@@ -110,7 +82,7 @@ class UserController extends Controller implements HasMiddleware
             return ApiResponseClass::sendError('User Not Found', 404);
         }
 
-        if ($loggedInUser->id !== $user->id) {
+        if ($loggedInUser->id !== $user->id && $loggedInUser->is_admin !== 1) {
             return ApiResponseClass::sendError('Unauthorized Access', 403);
         }
 
@@ -119,7 +91,7 @@ class UserController extends Controller implements HasMiddleware
             ->where('id', '!=', $id)
             ->first();
 
-        if ($existingUserWithEmail && $existingUserWithEmail->id !== $id) {
+        if ($existingUserWithEmail) {
             return ApiResponseClass::sendError('The Email has already been taken by another user.', 422);
         }
 
@@ -128,7 +100,7 @@ class UserController extends Controller implements HasMiddleware
             ->where('id', '!=', $id)
             ->first();
 
-        if ($existingUserWithName && $existingUserWithName->id !== $id) {
+        if ($existingUserWithName) {
             return ApiResponseClass::sendError('The Name has already been taken by another user.', 422);
         }
 
@@ -142,6 +114,7 @@ class UserController extends Controller implements HasMiddleware
         $updateDetails = [
             'name' => $request->name ?? $user->name,
             'email' => $newEmail ?? $user->email,
+            'is_admin' => $request->is_admin ?? $user->is_admin,
             'password' => $request->password ? bcrypt($request->password) : $user->password,
             'images' => $oldImagePath,
         ];
@@ -161,16 +134,12 @@ class UserController extends Controller implements HasMiddleware
 
             DB::commit();
             return ApiResponseClass::sendResponse('User Update Successful', '', 200);
-
         } catch (\Exception $ex) {
             DB::rollBack();
             return ApiResponseClass::rollback($ex);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $user = $this->userRepositoryInterface->getById($id);

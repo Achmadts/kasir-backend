@@ -26,6 +26,7 @@ class UpdateUserRequest extends FormRequest
         return [
             "email" => "email",
             "password" => "min:6",
+            "is_admin" => "nullable|in:0,1",
             "images" => "nullable|mimes:png,jpg,jpeg|max:2048"
         ];
     }

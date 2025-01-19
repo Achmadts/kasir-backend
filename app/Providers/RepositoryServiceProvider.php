@@ -2,17 +2,21 @@
 
 namespace App\Providers;
 
-use App\Interfaces\KategoriRepositoryInterface;
-use App\Interfaces\PembelianRepositoryInterface;
-use App\Interfaces\PenjualanRepositoryInterface;
-use App\Repositories\KategoriRepository;
-use App\Repositories\PembelianRepository;
-use App\Repositories\PenjualanRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\ProductRepository;
+use App\Interfaces\{
+    PembelianRepositoryInterface,
+    KategoriRepositoryInterface,
+    PenjualanRepositoryInterface,
+    UserRepositoryInterface,
+    ProductRepositoryInterface
+};
+use App\Repositories\{
+    KategoriRepository,
+    PembelianRepository,
+    PenjualanRepository,
+    UserRepository,
+    ProductRepository
+};
 use Illuminate\Support\ServiceProvider;
-use App\Interfaces\UserRepositoryInterface;
-use App\Interfaces\ProductRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
