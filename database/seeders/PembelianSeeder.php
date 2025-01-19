@@ -13,9 +13,9 @@ class PembelianSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = new DateTime('2024-01-17');
+        $startDate = new DateTime('2015-01-23');
 
-        for ($i = 1; $i <= 1825; $i++) {
+        for ($i = 1; $i <= 3650; $i++) {
             $jumlahBarang = random_int(1, 100);
             $hargaBeli = random_int(500, 5000);
             $totalPembayaran = $jumlahBarang * $hargaBeli;
