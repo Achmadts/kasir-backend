@@ -126,6 +126,6 @@ class PembelianController extends Controller implements HasMiddleware
     public function destroy($id)
     {
         $this->pembelianRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('Pembelian Delete Successful', '', 204);
+        return ApiResponseClass::sendResponse('Pembelian Delete Successful', 204);
     }
 }
