@@ -88,6 +88,11 @@ class PembelianController extends Controller implements HasMiddleware
     public function show($id)
     {
         $pembelian = $this->pembelianRepositoryInterface->getById($id);
+
+        if (!$pembelian) {
+            return ApiResponseClass::sendError('Pembelian Not Found', 404);
+        }
+
         return APiResponseClass::sendResponse(new PembelianResource($pembelian), '', 200);
     }
 
