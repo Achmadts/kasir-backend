@@ -27,7 +27,8 @@ class UpdateUserRequest extends FormRequest
             "email" => "email",
             "password" => "min:6",
             "is_admin" => "nullable|in:0,1",
-            "images" => "nullable|mimes:png,jpg,jpeg|max:2048"
+            "images" => "nullable|mimes:png,jpg,jpeg|max:2048",
+            "status" => "nullable|in:Active,Inactive"
         ];
     }
     public function failedValidation(Validator $validator)

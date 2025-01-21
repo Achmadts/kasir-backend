@@ -26,6 +26,13 @@ class LoginController extends Controller
             ], 401);
         }
 
+        if ($user->status === 'Inactive') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
+            ], 403);
+        }
+
         try {
             $accessToken = JWTAuth::fromUser($user);
             $refreshToken = JWTAuth::fromUser($user);

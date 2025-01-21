@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('password');
             $table->integer('is_admin')->default(0); // 0 = user | 1 = admin
             $table->string('images')->nullable();
+            $table->enum('status', ["Active", "Inactive"])->default("Active");
             $table->timestamps();
         });
 

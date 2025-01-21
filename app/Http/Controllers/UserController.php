@@ -57,6 +57,7 @@ class UserController extends Controller implements HasMiddleware
             'is_admin' => $request->is_admin,
             'password' => bcrypt($request->password),
             'images' => $imagePath,
+            'status' => $request->status,
         ];
 
         DB::beginTransaction();
@@ -128,6 +129,7 @@ class UserController extends Controller implements HasMiddleware
             'is_admin' => $request->is_admin ?? $user->is_admin,
             'password' => $request->password ? bcrypt($request->password) : $user->password,
             'images' => $oldImagePath,
+            'status' => $request->status ?? $user->status,
         ];
 
         DB::beginTransaction();
