@@ -24,15 +24,21 @@ class UpdatePembelianRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id_produk' => 'array|min:1',
+            'id_produk.*' => 'exists:produks,id',
+            'jumlah_produk' => 'array|min:1',
+            'jumlah_produk.*' => 'integer|min:1',
+            'sub_total' => 'array|min:1',
+            'sub_total.*' => 'numeric|min:0',
             'date' => 'date',
-            'nama_supplier' => 'nullable',
-            'tax' => 'nullable',
-            'discount' => 'nullable',
-            'jumlah_barang' => 'nullable',
-            'status' => 'in:Success,Pending,Cancel',
-            'payment_method' => 'in:Cash,Bank Transfer,Credit Card',
-            'total_pembayaran' => 'nullable',
-            'note' => 'nullable'
+            'nama_supplier' => 'string',
+            'tax' => 'numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
+            'quantity' => 'integer|min:1',
+            'status' => 'in:Pending,Completed',
+            'payment_method' => 'in:Cash,Credit Card,Bank Transfer',
+            'total_pembayaran' => 'numeric|min:0',
+            'note' => 'nullable|string',
         ];
     }
     public function failedValidation(Validator $validator)

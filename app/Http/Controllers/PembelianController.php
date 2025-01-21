@@ -105,25 +105,49 @@ class PembelianController extends Controller implements HasMiddleware
         }
 
         $updateDetails = [
-            'id_produk' => $request->id_produk ?? $pembelian->id_produk,
             'date' => $request->date ?? $pembelian->date,
             'nama_supplier' => $request->nama_supplier ?? $pembelian->nama_supplier,
             'tax' => $request->tax ?? $pembelian->tax,
             'discount' => $request->discount ?? $pembelian->discount,
-            'jumlah_barang' => $request->jumlah_barang ?? $pembelian->jumlah_barang,
             'status' => $request->status ?? $pembelian->status,
             'payment_method' => $request->payment_method ?? $pembelian->payment_method,
             'total_pembayaran' => $request->total_pembayaran ?? $pembelian->total_pembayaran,
-            'note' => $request->note ?? $pembelian->note
+            'note' => $request->note ?? $pembelian->note,
+            'quantity' => $request->quantity ?? $pembelian->quantity,
         ];
+
         DB::beginTransaction();
         try {
-            $pembelian = $this->pembelianRepositoryInterface->update($updateDetails, $id);
+            $this->pembelianRepositoryInterface->update($updateDetails, $id);
+            $idProduks = $request->id_produk;
+            $jumlahProduks = $request->jumlah_produk;
+            $subTotals = $request->sub_total;
+            $currentDetails = DB::table('detail_pembelians')->where('id_pembelian', $id)->get();
+            foreach ($currentDetails as $detail) {
+                DB::table('produks')->where('id', $detail->id_produk)->decrement('stok', $detail->jumlah_produk);
+            }
+
+            DB::table('detail_pembelians')->where('id_pembelian', $id)->delete();
+            foreach ($idProduks as $index => $idProduk) {
+                $stokIncrement = $jumlahProduks[$index] ?? 0;
+
+                DB::table('produks')->where('id', $idProduk)->increment('stok', $stokIncrement);
+
+                DB::table('detail_pembelians')->insert([
+                    'id_pembelian' => $id,
+                    'id_produk' => $idProduk,
+                    'jumlah_produk' => $stokIncrement,
+                    'sub_total' => $subTotals[$index] ?? 0,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
 
             DB::commit();
             return ApiResponseClass::sendResponse('Pembelian Update Successful', '', 201);
 
         } catch (\Exception $ex) {
+            DB::rollBack();
             return ApiResponseClass::rollback($ex);
         }
     }
