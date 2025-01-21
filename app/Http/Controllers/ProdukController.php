@@ -22,7 +22,7 @@ class ProdukController extends Controller implements HasMiddleware
         return [
             'auth:api',
             new Middleware(CheckJwtToken::class, only: ['index', 'show', 'store', 'update', 'destroy']), //opsional
-            new Middleware(CheckAdmin::class, only: ['update', 'destroy', 'store']), // method yang tidak boleh diakses oleh is_admin === 0
+            new Middleware(CheckAdmin::class, only: ['destroy']), // method yang tidak boleh diakses oleh is_admin === 0
         ];
     }
 
