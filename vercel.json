@@ -2,19 +2,19 @@
     "version": 2,
     "framework": null,
     "functions": {
-        "api/index.php": { "runtime": "vercel-php@0.6.0" }
+        "api/index.php": { "runtime": "vercel-php@0.6.2" }
     },
     "routes": [
-        { "src": "/build/(.*)", "dest": "/public/build/$1" },
+        { "src": "/build/(.*)", "dest": "/public/build/" },
         { "src": "/(.*)", "dest": "/api/index.php" }
     ],
     "public": true,
-    "buildCommand": "composer install --ignore-platform-reqs --optimize-autoloader --no-dev && php artisan config:cache && php artisan route:cache && php artisan view:cache",
+    "buildCommand": "vite build",
     "outputDirectory": "public",
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false",
-        "APP_URL": "https://kasir-backend-bek31dz82-achmad-tirto-sudiros-projects.vercel.app/",
+        "APP_URL": "https://yourproductionurl.com",
         "APP_KEY": "base64:amRn+s2GqN9iwc2uqcbSVk95cHeVZl+0dGikLonZpM8=",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
