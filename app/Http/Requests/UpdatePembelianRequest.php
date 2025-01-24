@@ -36,7 +36,7 @@ class UpdatePembelianRequest extends FormRequest
             'discount' => 'nullable|numeric|min:0',
             'quantity' => 'integer|min:1',
             'status' => 'in:Pending,Completed',
-            'payment_method' => 'in:Cash,Credit Card,Bank Transfer',
+            // 'payment_method' => 'in:Cash,Credit Card,Bank Transfer',
             'total_pembayaran' => 'numeric|min:0',
             'note' => 'nullable|string',
         ];

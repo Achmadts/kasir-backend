@@ -52,7 +52,7 @@ class PembelianController extends Controller implements HasMiddleware
             'tax' => $request->tax,
             'discount' => $request->discount,
             'status' => $request->status,
-            'payment_method' => $request->payment_method,
+            'payment_method' => "Cash",
             'total_pembayaran' => $request->total_pembayaran,
             'note' => $request->note,
             'quantity' => $request->quantity,
@@ -110,7 +110,7 @@ class PembelianController extends Controller implements HasMiddleware
             'tax' => $request->tax ?? $pembelian->tax,
             'discount' => $request->discount ?? $pembelian->discount,
             'status' => $request->status ?? $pembelian->status,
-            'payment_method' => $request->payment_method ?? $pembelian->payment_method,
+            'payment_method' => $pembelian->payment_method,
             'total_pembayaran' => $request->total_pembayaran ?? $pembelian->total_pembayaran,
             'note' => $request->note ?? $pembelian->note,
             'quantity' => $request->quantity ?? $pembelian->quantity,
@@ -153,7 +153,13 @@ class PembelianController extends Controller implements HasMiddleware
     }
 
     public function destroy($id)
-    {
+    {        
+        $pembelian = $this->pembelianRepositoryInterface->getById($id);
+        
+        if (!$pembelian) {
+            return ApiResponseClass::sendError('Pembelian Not Found', 404);
+        }
+        
         $this->pembelianRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('Pembelian Delete Successful', 204);
     }

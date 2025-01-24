@@ -37,7 +37,7 @@ class UpdatePenjualanRequest extends FormRequest
             'diskon' => 'numeric|min:0',
             'total_harga' => 'numeric|min:0',
             'status' => 'in:Pending,Completed,Cancelled',
-            'metode_pembayaran' => 'in:Cash,Credit Card,Bank Transfer',
+            // 'metode_pembayaran' => 'in:Cash,Credit Card,Bank Transfer',
             'catatan' => 'nullable|string',
         ];
     }

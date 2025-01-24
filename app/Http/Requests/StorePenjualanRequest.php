@@ -37,7 +37,7 @@ class StorePenjualanRequest extends FormRequest
             'diskon' => 'required|numeric|min:0',
             'total_harga' => 'required|numeric|min:0',
             'status' => 'required|in:Pending,Completed,Cancelled',
-            'metode_pembayaran' => 'required|in:Cash,Credit Card,Bank Transfer',
+            // 'metode_pembayaran' => 'required|in:Cash,Credit Card,Bank Transfer',
             'catatan' => 'nullable|string',
         ];
     }

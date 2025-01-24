@@ -145,7 +145,7 @@ class PenjualanController extends Controller implements HasMiddleware
                 'diskon' => $request->diskon,
                 'total_harga' => $request->total_harga,
                 'status' => $request->status,
-                'metode_pembayaran' => $request->metode_pembayaran,
+                'metode_pembayaran' => "Cash",
                 'catatan' => $request->catatan,
                 'id_pelanggan' => $pelanggan,
                 'created_at' => now(),
@@ -228,7 +228,7 @@ class PenjualanController extends Controller implements HasMiddleware
                 'diskon' => $request->diskon ?? $penjualan->diskon,
                 'total_harga' => $request->total_harga ?? $penjualan->total_harga,
                 'status' => $request->status ?? $penjualan->status,
-                'metode_pembayaran' => $request->metode_pembayaran ?? $penjualan->metode_pembayaran,
+                'metode_pembayaran' => $penjualan->metode_pembayaran,
                 'catatan' => $request->catatan ?? $penjualan->catatan,
                 'updated_at' => now(),
             ]);
