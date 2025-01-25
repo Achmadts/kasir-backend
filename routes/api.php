@@ -9,9 +9,11 @@ use App\Http\Controllers\{
     PenjualanController,
     ProdukController
 };
+use App\Http\Controllers\RegisterController;
 use App\Http\Middleware\{CheckJwtToken, RedirectIfAuthenticatedApi};
 use Illuminate\Support\Facades\Route;
 
+Route::post('/register', [RegisterController::class, 'index'])->name('register')->middleware(RedirectIfAuthenticatedApi::class);
 Route::post('/authenticate', [LoginController::class, 'index'])->name('authenticate')->middleware(RedirectIfAuthenticatedApi::class);
 Route::get('/login', [LoginController::class, 'getUser'])->name('login')->middleware(RedirectIfAuthenticatedApi::class);
 Route::post('/refresh-token', [LoginController::class, 'refreshAccessToken'])->name("refreshToken");
