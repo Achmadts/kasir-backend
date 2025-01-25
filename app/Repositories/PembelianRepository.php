@@ -14,7 +14,6 @@ class PembelianRepository implements PembelianRepositoryInterface
         if ($searchTerm) {
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('nama_supplier', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('id_produk', 'like', '%' . $searchTerm . '%')
                     ->orWhere('date', 'like', '%' . $searchTerm . '%');
             });
         }
