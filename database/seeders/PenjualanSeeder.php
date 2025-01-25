@@ -14,7 +14,7 @@ class PenjualanSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = new DateTime('2015-01-23');
+        $startDate = new DateTime('2015-01-30');
 
         for ($i = 1; $i <= 3650; $i++) {
             $produk = DB::table('produks')->where('id', $i)->first();

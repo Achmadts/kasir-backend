@@ -13,7 +13,7 @@ class PembelianSeeder extends Seeder
      */
     public function run(): void
     {
-        $startDate = new DateTime('2015-01-23');
+        $startDate = new DateTime('2015-01-30');
 
         for ($i = 1; $i <= 3650; $i++) {
             $jumlahBarang = random_int(1, 100);
