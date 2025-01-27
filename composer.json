@@ -13,6 +13,7 @@
         "dedoc/scramble": "^0.11.33",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.17",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "tymon/jwt-auth": "*"
