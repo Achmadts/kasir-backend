@@ -86,7 +86,14 @@ class SocialLoginController extends Controller
             );
 
             $token = auth('api')->login($user);
-            return redirect("http://localhost:5173?token=$token");
+            return redirect("http://localhost:5173?token=$token&is_admin={$user->is_admin}");
+            // return response()->json([
+            //     'message' => 'Logged in successfully',
+            //     'data' => [
+            //         'user' => $user,
+            //         'token' => $token,
+            //     ],
+            // ]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
