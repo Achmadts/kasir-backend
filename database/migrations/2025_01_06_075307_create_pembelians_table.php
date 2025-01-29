@@ -19,8 +19,11 @@ return new class extends Migration
             $table->decimal("discount", 10, 2)->nullable();
             $table->integer("quantity");
             $table->enum("status", ['Pending', 'Completed']);
-            $table->enum("payment_method", ['Cash', 'Credit Card', 'Bank Transfer']);
+            $table->enum("payment_method", ['Cash', 'Bank Transfer']);
             $table->integer("total_pembayaran");
+            $table->bigInteger("no_rekening_penerima")->nullable();
+            $table->string("nama_rekening_penerima")->nullable();
+            $table->string("bukti_transfer");
             $table->string("note")->nullable();
             $table->timestamps();
         });

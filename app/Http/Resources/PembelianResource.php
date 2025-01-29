@@ -24,6 +24,9 @@ class PembelianResource extends JsonResource
             'total_pembayaran' => $this->total_pembayaran,
             'status' => $this->status,
             'payment_method' => $this->payment_method,
+            'no_rekening_penerima' => $this->no_rekening_penerima,
+            'nama_rekening_penerima' => $this->nama_rekening_penerima,
+            'bukti_transfer' => $this->bukti_transfer ? url('storage/' . $this->bukti_transfer) : null,
             'note' => $this->note ?? null,
             'detail_pembelians' => DetailPembelianResource::collection($this->detailPembelians),
         ];

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Classes\ApiResponseClass;
-use Illuminate\Support\Facades\DB;
-use App\Http\Resources\PembelianResource;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PembelianExport;
+use App\Classes\ApiResponseClass;
+use Illuminate\Support\Facades\{Storage, DB};
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Resources\PembelianResource;
 use App\Interfaces\PembelianRepositoryInterface;
 use App\Http\Middleware\{CheckAdmin, CheckJwtToken};
 use Illuminate\Routing\Controllers\{Middleware, HasMiddleware};
@@ -52,11 +52,21 @@ class PembelianController extends Controller implements HasMiddleware
             'tax' => $request->tax,
             'discount' => $request->discount,
             'status' => $request->status,
-            'payment_method' => "Cash",
+            'payment_method' => $request->payment_method,
             'total_pembayaran' => $request->total_pembayaran,
             'note' => $request->note,
             'quantity' => $request->quantity,
         ];
+
+        if ($request->hasFile('bukti_transfer')) {
+            $filePath = $request->file('bukti_transfer')->store('bukti_transfer', 'public');
+            $details['bukti_transfer'] = $filePath;
+        }
+
+        if ($request->payment_method === 'Bank Transfer') {
+            $details['no_rekening_penerima'] = $request->no_rekening_penerima;
+            $details['nama_rekening_penerima'] = $request->nama_rekening_penerima;
+        }
 
         DB::beginTransaction();
         try {
@@ -64,7 +74,6 @@ class PembelianController extends Controller implements HasMiddleware
             $idProduks = $request->id_produk;
             $jumlahProduks = $request->jumlah_produk;
             $subTotals = $request->sub_total;
-
             foreach ($idProduks as $index => $idProduk) {
                 $stokIncrement = $jumlahProduks[$index] ?? 0;
                 DB::table('produks')->where('id', $idProduk)->increment('stok', $stokIncrement);
@@ -85,6 +94,7 @@ class PembelianController extends Controller implements HasMiddleware
             return ApiResponseClass::rollback($ex);
         }
     }
+
     public function show($id)
     {
         $pembelian = $this->pembelianRepositoryInterface->getById($id);
@@ -110,11 +120,24 @@ class PembelianController extends Controller implements HasMiddleware
             'tax' => $request->tax ?? $pembelian->tax,
             'discount' => $request->discount ?? $pembelian->discount,
             'status' => $request->status ?? $pembelian->status,
-            'payment_method' => $pembelian->payment_method,
+            'payment_method' => $request->payment_method ?? $pembelian->payment_method,
             'total_pembayaran' => $request->total_pembayaran ?? $pembelian->total_pembayaran,
             'note' => $request->note ?? $pembelian->note,
             'quantity' => $request->quantity ?? $pembelian->quantity,
         ];
+
+        if ($request->hasFile('bukti_transfer')) {
+            if ($pembelian->bukti_transfer && Storage::disk('public')->exists($pembelian->bukti_transfer)) {
+                Storage::disk('public')->delete($pembelian->bukti_transfer);
+            }
+            $filePath = $request->file('bukti_transfer')->store('bukti_transfer', 'public');
+            $updateDetails['bukti_transfer'] = $filePath;
+        }
+
+        if (($request->payment_method ?? $pembelian->payment_method) === 'Bank Transfer') {
+            $updateDetails['no_rekening_penerima'] = $request->no_rekening_penerima ?? $pembelian->no_rekening_penerima;
+            $updateDetails['nama_rekening_penerima'] = $request->nama_rekening_penerima ?? $pembelian->nama_rekening_penerima;
+        }
 
         DB::beginTransaction();
         try {
@@ -130,9 +153,7 @@ class PembelianController extends Controller implements HasMiddleware
             DB::table('detail_pembelians')->where('id_pembelian', $id)->delete();
             foreach ($idProduks as $index => $idProduk) {
                 $stokIncrement = $jumlahProduks[$index] ?? 0;
-
                 DB::table('produks')->where('id', $idProduk)->increment('stok', $stokIncrement);
-
                 DB::table('detail_pembelians')->insert([
                     'id_pembelian' => $id,
                     'id_produk' => $idProduk,
@@ -145,21 +166,24 @@ class PembelianController extends Controller implements HasMiddleware
 
             DB::commit();
             return ApiResponseClass::sendResponse('Pembelian Update Successful', '', 201);
-
         } catch (\Exception $ex) {
             DB::rollBack();
             return ApiResponseClass::rollback($ex);
         }
     }
-
     public function destroy($id)
-    {        
+    {
         $pembelian = $this->pembelianRepositoryInterface->getById($id);
-        
+
         if (!$pembelian) {
             return ApiResponseClass::sendError('Pembelian Not Found', 404);
         }
-        
+
+        $path = $pembelian->bukti_transfer;
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+
         $this->pembelianRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('Pembelian Delete Successful', 204);
     }

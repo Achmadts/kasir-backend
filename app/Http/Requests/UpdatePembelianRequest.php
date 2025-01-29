@@ -36,7 +36,10 @@ class UpdatePembelianRequest extends FormRequest
             'discount' => 'nullable|numeric|min:0',
             'quantity' => 'integer|min:1',
             'status' => 'in:Pending,Completed',
-            // 'payment_method' => 'in:Cash,Credit Card,Bank Transfer',
+            'payment_method' => 'required|in:Cash,Bank Transfer',
+            'no_rekening_penerima' => 'required_if:payment_method,Bank Transfer|string|max:255',
+            'nama_rekening_penerima' => 'required_if:payment_method,Bank Transfer|string|max:255',
+            'bukti_transfer' => 'required|file|mimes:jpg,png,jpeg',
             'total_pembayaran' => 'numeric|min:0',
             'note' => 'nullable|string',
         ];

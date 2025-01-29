@@ -46,6 +46,9 @@ class PembelianSeeder extends Seeder
                 'payment_method' => 'Cash',
                 'total_pembayaran' => $totalPembayaran,
                 'note' => 'Catatan ' . $i,
+                'no_rekening_penerima' => '123456789' . $i,
+                'nama_rekening_penerima' => 'Nama Rekening Penerima ' . $i,
+                'bukti_transfer' => 'bukti_transfer' . $i . '.jpg',
             ]);
 
             $subTotal = ($totalPembayaran - $tax - $discount) / $jumlahBarang;
