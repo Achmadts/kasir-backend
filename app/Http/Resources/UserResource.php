@@ -21,7 +21,11 @@ class UserResource extends JsonResource
             'password' => $this->password,
             'is_admin' => $this->is_admin,
             'status' => $this->status,
-            'images' => $this->images ? asset('storage/' . $this->images) : null,
+            'images' => $this->images
+                ? (filter_var($this->images, FILTER_VALIDATE_URL)
+                    ? $this->images
+                    : asset('storage/' . $this->images))
+                : null,
         ];
     }
 }

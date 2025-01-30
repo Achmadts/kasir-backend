@@ -122,6 +122,7 @@ class LoginController extends Controller
                 ], 401);
             }
 
+            $user->images = $user->images ? str_replace('\\', '', $user->images) : null;
             return response()->json([
                 'success' => true,
                 'email' => $user->email,
